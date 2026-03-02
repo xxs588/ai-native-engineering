@@ -167,6 +167,185 @@ graph TD;
     C -->|No| E[重复造轮子];
 ```
 
+## 🧪 Markdown 语法回归测试区
+
+这一节用于做视觉与渲染回归，目标是覆盖常见语法：段落、强调、列表、引用、表格、代码、媒体、嵌套提示框等。
+
+### 文本与链接
+
+这是普通段落，包含 **加粗**、*斜体*、~~删除线~~、`inline code`、以及 [站内链接](/docs/level-1/mindset-shift) 与 [外部链接](https://nextjs.org/)。
+
+### 列表与任务
+
+- 一级无序项 A
+    - 二级无序项 A-1（测试缩进与 marker）
+    - 二级无序项 A-2（含 `inline code`）
+- 一级无序项 B
+
+1. 一级有序项 1
+2. 一级有序项 2
+     1. 二级有序项 2-1
+     2. 二级有序项 2-2
+
+- [x] 已完成任务（Task List）
+- [ ] 待完成任务（Task List）
+
+### 引用与分隔线
+
+> 这是一级引用。
+>
+> > 这是二级引用，用于测试嵌套引用在深浅色下的层级与导示条。
+
+---
+
+### 表格
+
+| 维度 | 目标 | 状态 |
+| :--- | :---: | ---: |
+| 样式对齐 | Fuwari 视觉 1:1 | 进行中 |
+| 行为一致 | TOC / 滚动激活 | 已完成 |
+| 构建质量 | typecheck + build | 已完成 |
+
+### 代码块
+
+```ts
+type Stage = "vibe" | "swarm";
+
+export function plan(stage: Stage) {
+    return stage === "vibe" ? "single-agent" : "agent-cluster";
+}
+```
+
+```bash
+bun run types:check
+bun run build
+```
+
+```json
+{
+    "name": "ai-native-engineering",
+    "mode": "static-export",
+    "runtime": "bun"
+}
+```
+
+```diff
+- TODO: 临时样式
++ DONE: 迁移到 Fuwari token
+```
+
+### 媒体与内嵌
+
+![外链测试图](https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1200&auto=format&fit=crop)
+
+<iframe
+    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+    title="iframe 测试"
+    width="560"
+    height="315"
+    loading="lazy"
+    referrerPolicy="no-referrer"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+/>
+
+### 细节折叠（HTML in MDX）
+
+<details>
+    <summary>点击展开更多测试内容</summary>
+
+    这是折叠区域内容，用于验证 `details/summary` 的排版、边距与可点击反馈。
+
+    - 折叠项 A
+    - 折叠项 B
+</details>
+
+### Callout 深度测试（::: 语法）
+
+:::note
+Note：用于常规说明。
+:::
+
+:::tip
+Tip：用于最佳实践提示。
+:::
+
+:::warning
+Warning：用于风险提醒。
+:::
+
+:::danger
+Danger：用于高危操作提醒。
+:::
+
+:::note[自定义标题 + 嵌套内容]
+这是一个带自定义标题的 note。
+
+:::warning
+这是嵌套在 note 内的 warning，用于测试内层层级。
+:::
+:::
+
+:::tip[列表 + 代码 + 引用混排]
+1. 先检查 `git status`
+2. 再运行 `bun run build`
+
+```bash
+bun run types:check && bun run build
+```
+
+> 混排内容用于验证 Callout 容器内部间距一致性。
+:::
+
+:::note[多层嵌套测试：Level 1 Note]
+这一层用于观察最外层容器的标题、before 导示条和正文间距。
+
+:::warning[Level 2 Warning]
+这一层用于观察在 Note 内部嵌套 Warning 时，子级 before 是否为 warning 色。
+
+:::tip[Level 3 Tip]
+这一层用于观察第三层嵌套时的缩进、导示条、标题图标与文本对齐。
+
+- 子项 A：验证列表缩进
+- 子项 B：验证 marker 与正文基线
+
+> 三级嵌套引用：验证混排时的层级可读性。
+:::
+:::
+:::
+
+:::warning[复杂 Markdown 压测]
+下面这一段用于测试在 Callout 内部混排复杂 Markdown 时的稳定性。
+
+1. 第一阶段：准备
+     - [x] 检查 `bun --version`
+     - [ ] 检查 `bun run types:check`
+2. 第二阶段：执行
+     - 运行增量验证
+     - 记录渲染差异
+
+| 维度 | 目标 | 说明 |
+| :--- | :---: | ---: |
+| title 色彩 | 按层级独立 | 不被父级污染 |
+| before 导示条 | 按类型独立 | 与 bdm-* 对齐 |
+| 内容排版 | 无异常折行 | 列表/表格/代码共存 |
+
+```ts
+type VerifyItem = {
+    id: string;
+    passed: boolean;
+};
+
+const checks: VerifyItem[] = [
+    { id: "nested-title-color", passed: true },
+    { id: "nested-before-color", passed: true },
+];
+```
+
+> 引用块验证：当内容包含 [外链](https://nextjs.org/) 与 `inline code` 时，行高与颜色应保持一致。
+:::
+
+
 ### Git 元信息注入
 
 通过 `lastModified()` 插件，我们在页面底部（评论区上方）实现了基于最近一条 Git 提交记录生成的页面「最后更新时间」。当你修改本页面并推送到主分支，时间会自动更新。

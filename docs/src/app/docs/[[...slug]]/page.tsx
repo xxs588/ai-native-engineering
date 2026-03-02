@@ -15,6 +15,7 @@ import { LicenseCard } from "@/components/layout/LicenseCard";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
+import styles from "./page.module.css";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
@@ -80,7 +81,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
             </DocsTitle>
           </div>
 
-          <DocsDescription className="mb-0">
+          <DocsDescription className={styles.pageDescription}>
             {page.data.description}
           </DocsDescription>
 
@@ -94,7 +95,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           </div>
 
           {/* markdown content */}
-          <DocsBody className="mb-6">
+          <DocsBody className={`${styles.customMd} mb-6`}>
             <MDX
               components={getMDXComponents({
                 a: createRelativeLink(source, page),

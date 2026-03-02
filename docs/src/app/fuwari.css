@@ -42,6 +42,30 @@
   --color-fd-muted: var(--color-btn-regular-bg);
   --color-fd-muted-foreground: var(--color-btn-content);
   --color-fd-border: var(--color-line-divider);
+
+  --primary: var(--color-primary);
+  --card-bg: var(--color-card-bg);
+  --btn-content: var(--color-btn-content);
+  --btn-regular-bg: var(--color-btn-regular-bg);
+  --btn-regular-bg-hover: var(--color-btn-regular-bg-hover);
+  --btn-regular-bg-active: var(--color-btn-regular-bg-active);
+  --btn-plain-bg-hover: var(--color-btn-plain-bg-hover);
+  --btn-plain-bg-active: var(--color-btn-plain-bg-active);
+  --line-divider: var(--color-line-divider);
+  --selection-bg: var(--color-selection-bg);
+  --license-block-bg: var(--color-license-block-bg);
+  --inline-code-bg: var(--color-btn-regular-bg);
+  --inline-code-color: var(--color-btn-content);
+  --link-underline: color-mix(in oklab, var(--color-primary) 45%, transparent);
+  --link-hover: var(--color-primary);
+  --link-active: var(--color-primary);
+  --codeblock-selection: var(--color-selection-bg);
+  --deep-text: var(--color-fd-foreground);
+  --admonitions-color-tip: oklch(0.7 0.14 180);
+  --admonitions-color-note: oklch(0.7 0.14 250);
+  --admonitions-color-important: oklch(0.7 0.14 310);
+  --admonitions-color-warning: oklch(0.7 0.14 60);
+  --admonitions-color-caution: oklch(0.6 0.2 25);
 }
 
 .dark {
@@ -63,6 +87,12 @@
   --color-toc-btn-hover: oklch(0.22 0.02 var(--hue));
   --color-toc-btn-active: oklch(0.25 0.02 var(--hue));
   --float-panel-shadow: none;
+
+  --admonitions-color-tip: oklch(0.75 0.14 180);
+  --admonitions-color-note: oklch(0.75 0.14 250);
+  --admonitions-color-important: oklch(0.75 0.14 310);
+  --admonitions-color-warning: oklch(0.75 0.14 60);
+  --admonitions-color-caution: oklch(0.65 0.2 25);
 }
 
 @layer components {

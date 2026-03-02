@@ -17,20 +17,14 @@ export const docs = defineDocs({
   },
 });
 
-import {
-  remarkDirectiveAdmonition,
-  remarkMdxMermaid,
-} from "fumadocs-core/mdx-plugins";
+import { remarkMdxMermaid } from "fumadocs-core/mdx-plugins";
 import remarkDirective from "remark-directive";
+import { remarkFuwariAdmonition } from "@/lib/remark-fuwari-admonition";
 
 export default defineConfig({
   mdxOptions: {
     preset: "fumadocs",
-    remarkPlugins: [
-      remarkDirective,
-      remarkDirectiveAdmonition,
-      remarkMdxMermaid,
-    ],
+    remarkPlugins: [remarkDirective, remarkFuwariAdmonition, remarkMdxMermaid],
   },
   plugins: [lastModified()],
 });
