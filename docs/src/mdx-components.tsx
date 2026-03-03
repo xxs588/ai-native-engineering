@@ -12,6 +12,68 @@ type HeadingProps = {
   id?: string;
 };
 
+type ListItemProps = {
+  children?: ReactNode;
+  className?: string;
+};
+
+function joinClassName(...classNames: Array<string | undefined>): string {
+  return classNames.filter(Boolean).join(" ");
+}
+
+function isCheckboxNode(node: ReactNode): boolean {
+  if (!isValidElement(node)) return false;
+  if (node.type !== "input") return false;
+
+  const props = node.props as {
+    type?: string;
+  };
+
+  return props.type === "checkbox";
+}
+
+function MdxListItem({ children, className, ...props }: ListItemProps) {
+  const nodes = Children.toArray(children);
+
+  const firstContentIndex = nodes.findIndex((node) => {
+    if (typeof node === "string") return node.trim().length > 0;
+    return true;
+  });
+
+  if (firstContentIndex < 0) {
+    return createElement("li", { ...props, className }, children);
+  }
+
+  const firstNode = nodes[firstContentIndex];
+  if (!isCheckboxNode(firstNode)) {
+    return createElement("li", { ...props, className }, children);
+  }
+
+  const restNodes = nodes.slice(firstContentIndex + 1);
+  while (restNodes.length > 0) {
+    const head = restNodes[0];
+    if (typeof head === "string" && head.trim().length === 0) {
+      restNodes.shift();
+      continue;
+    }
+    break;
+  }
+
+  return createElement(
+    "li",
+    {
+      ...props,
+      className: joinClassName(className, "task-list-item-row"),
+    },
+    createElement(
+      "span",
+      { className: "task-list-checkbox-wrap", "aria-hidden": true },
+      firstNode,
+    ),
+    createElement("div", { className: "task-list-content" }, restNodes),
+  );
+}
+
 function createHeading(level: HeadingLevel) {
   return function Heading({ children, id, ...props }: HeadingProps) {
     const items = Children.toArray(children);
@@ -80,6 +142,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     h4: createHeading("h4"),
     h5: createHeading("h5"),
     h6: createHeading("h6"),
+    li: MdxListItem,
     Callout: MdxCallout,
     Mermaid,
   };

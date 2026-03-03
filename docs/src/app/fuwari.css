@@ -2,6 +2,10 @@
 
 :root {
   --hue: 250;
+  --font-sans-blog:
+    Roboto, sans-serif, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans",
+    sans-serif;
   --radius-large: 1rem;
   --content-delay: 150ms;
   --panel-gap: 1rem;
@@ -72,6 +76,10 @@
   --color-primary: oklch(0.75 0.14 var(--hue));
   --color-page-bg: oklch(0.16 0.014 var(--hue));
   --color-card-bg: oklch(0.23 0.015 var(--hue));
+  --color-fd-background: var(--color-page-bg);
+  --color-fd-foreground: oklch(0.92 0.01 var(--hue));
+  --color-fd-card: var(--color-card-bg);
+  --color-fd-card-foreground: var(--color-fd-foreground);
   --color-btn-content: oklch(0.75 0.1 var(--hue));
   --color-btn-regular-bg: oklch(0.33 0.035 var(--hue));
   --color-btn-regular-bg-hover: oklch(0.38 0.04 var(--hue));
@@ -197,6 +205,12 @@
 
 body {
   background-color: var(--color-fd-background);
+  font-family: var(--font-sans-blog);
+}
+
+#fuwari-layout-root,
+#nd-page {
+  font-family: var(--font-sans-blog);
 }
 
 #main-grid {

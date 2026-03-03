@@ -35,6 +35,24 @@
   color: color-mix(in oklab, var(--deep-text) 64%, transparent);
 }
 
+.customMd {
+  color: var(--deep-text);
+  --tw-prose-body: var(--deep-text);
+  --tw-prose-headings: var(--deep-text);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--deep-text);
+  --tw-prose-counters: color-mix(in oklab, var(--deep-text) 58%, transparent);
+  --tw-prose-bullets: color-mix(in oklab, var(--deep-text) 42%, transparent);
+  --tw-prose-hr: var(--line-divider);
+  --tw-prose-quote-borders: var(--btn-regular-bg);
+  --tw-prose-captions: color-mix(in oklab, var(--deep-text) 64%, transparent);
+  --tw-prose-code: var(--inline-code-color);
+  --tw-prose-pre-code: inherit;
+  --tw-prose-pre-bg: transparent;
+  --tw-prose-th-borders: var(--line-divider);
+  --tw-prose-td-borders: var(--line-divider);
+}
+
 .customMd h1 {
   font-size: 1.875rem;
   line-height: 2.25rem;
@@ -175,11 +193,16 @@
   background: var(--btn-plain-bg-active);
 }
 
-.customMd code:not(pre code):not([class*="language-"]) {
-  background: var(--inline-code-bg);
+.customMd code:not(pre code) {
+  background-color: var(--inline-code-bg);
   color: var(--inline-code-color);
+  border: none;
   border-radius: 0.375rem;
-  padding: 0.125rem 0.25rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+  font-weight: 600;
   overflow: hidden;
   font-family:
     "JetBrains Mono Variable",
@@ -193,8 +216,8 @@
     monospace;
 }
 
-.customMd code:not(pre code):not([class*="language-"])::before,
-.customMd code:not(pre code):not([class*="language-"])::after {
+.customMd code:not(pre code)::before,
+.customMd code:not(pre code)::after {
   content: none;
 }
 
@@ -202,14 +225,30 @@
 .customMd pre {
   margin: 1rem 0;
   border-radius: 0.75rem;
-  border: 1px dashed var(--line-divider);
   overflow-x: auto;
 }
 
 .customMd :is(.shiki, pre) code {
   background: transparent;
   color: inherit;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  overflow: visible;
   counter-reset: line;
+}
+
+.customMd :is(.shiki, pre) code,
+.customMd div[role="region"] pre > code {
+  background: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
 }
 
 .customMd :is(.shiki, pre) code span.line::before {
@@ -237,11 +276,10 @@
 
 .customMd ul[class~="contains-task-list"] > li[class~="task-list-item"] {
   list-style: none;
-  display: grid;
-  grid-template-columns: 1rem minmax(0, 1fr);
-  align-items: start;
-  column-gap: 0.55rem;
-  min-height: 1.75em;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  line-height: inherit;
 }
 
 .customMd
@@ -253,33 +291,79 @@
 .customMd
   ul[class~="contains-task-list"]
   > li[class~="task-list-item"]
+  > [class~="task-list-checkbox-wrap"] {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: calc((1.75em - 1rem) / 2);
+}
+
+.customMd
+  ul[class~="contains-task-list"]
+  > li[class~="task-list-item"]
+  > [class~="task-list-checkbox-wrap"]
   > input[type="checkbox"] {
   appearance: none;
   width: 1rem;
   height: 1rem;
-  margin: calc((1.75em - 1rem) / 2) 0 0 0;
+  margin: 0;
   border-radius: 0.3rem;
   border: 1px solid var(--line-divider);
   background: var(--card-bg);
   display: inline-grid;
   place-content: center;
   flex-shrink: 0;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .customMd
   ul[class~="contains-task-list"]
   > li[class~="task-list-item"]
-  > :not(input[type="checkbox"]) {
-  grid-column: 2;
+  > [class~="task-list-content"] {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  line-height: inherit;
 }
 
-.customMd ul[class~="contains-task-list"] > li[class~="task-list-item"] > p {
+.customMd
+  ul[class~="contains-task-list"]
+  > li[class~="task-list-item"]
+  > [class~="task-list-content"]
+  > p {
   margin: 0;
 }
 
 .customMd
   ul[class~="contains-task-list"]
   > li[class~="task-list-item"]
+  > [class~="task-list-content"]
+  > :first-child {
+  margin-top: 0;
+}
+
+.customMd
+  ul[class~="contains-task-list"]
+  > li[class~="task-list-item"]
+  > [class~="task-list-content"]
+  > :last-child {
+  margin-bottom: 0;
+}
+
+.customMd
+  ul[class~="contains-task-list"]
+  > li[class~="task-list-item"]
+  > [class~="task-list-content"]
+  code:not(pre code) {
+  vertical-align: baseline;
+}
+
+.customMd
+  ul[class~="contains-task-list"]
+  > li[class~="task-list-item"]
+  > [class~="task-list-checkbox-wrap"]
   > input[type="checkbox"]::after {
   content: "";
   width: 0.65rem;
@@ -296,6 +380,7 @@
 .customMd
   ul[class~="contains-task-list"]
   > li[class~="task-list-item"]
+  > [class~="task-list-checkbox-wrap"]
   > input[type="checkbox"]:checked {
   background: var(--primary);
   border-color: var(--primary);
@@ -304,6 +389,7 @@
 .customMd
   ul[class~="contains-task-list"]
   > li[class~="task-list-item"]
+  > [class~="task-list-checkbox-wrap"]
   > input[type="checkbox"]:checked::after {
   transform: scale(1);
 }
@@ -349,12 +435,75 @@
   max-width: 100%;
 }
 
-.customMd table :is(th, td) {
-  border-color: var(--line-divider);
+.customMd div[class~="overflow-auto"][class~="prose-no-margin"] {
+  margin: 1rem 0;
+  border: 1px dashed var(--line-divider);
+  border-radius: 0.65rem;
+  background: var(--card-bg);
+  overflow: hidden;
 }
 
-.customMd table th {
-  background: var(--btn-regular-bg);
+.customMd div[class~="overflow-auto"][class~="prose-no-margin"] > table {
+  width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+}
+
+.customMd
+  div[class~="overflow-auto"][class~="prose-no-margin"]
+  > table
+  :is(th, td) {
+  padding: 0.7rem 0.95rem;
+  border-bottom: 1px dashed var(--line-divider);
+  vertical-align: top;
+  text-align: left;
+}
+
+.customMd
+  div[class~="overflow-auto"][class~="prose-no-margin"]
+  > table
+  tbody
+  tr:last-child
+  :is(td, th) {
+  border-bottom: none;
+}
+
+.customMd div[class~="overflow-auto"][class~="prose-no-margin"] > table th {
+  font-weight: 600;
+  background: color-mix(
+    in oklab,
+    var(--btn-regular-bg) 84%,
+    var(--card-bg) 16%
+  );
+  color: var(--deep-text);
+}
+
+.customMd
+  div[class~="overflow-auto"][class~="prose-no-margin"]
+  > table
+  tbody
+  tr:nth-child(odd)
+  td {
+  background: color-mix(
+    in oklab,
+    var(--card-bg) 100%,
+    var(--btn-regular-bg) 0%
+  );
+}
+
+.customMd
+  div[class~="overflow-auto"][class~="prose-no-margin"]
+  > table
+  tbody
+  tr:nth-child(even)
+  td {
+  background: color-mix(
+    in oklab,
+    var(--card-bg) 78%,
+    var(--btn-regular-bg) 22%
+  );
 }
 
 .customMd blockquote[class~="admonition"] {
