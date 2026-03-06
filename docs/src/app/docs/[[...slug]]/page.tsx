@@ -23,7 +23,17 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const MDX = page.data.body;
+  const pageData = page.data as typeof page.data & {
+    body?: (props: { components?: Record<string, unknown> }) => React.ReactNode;
+    load?: () => Promise<{
+      body: (props: {
+        components?: Record<string, unknown>;
+      }) => React.ReactNode;
+    }>;
+  };
+
+  const MDX = pageData.body ?? (await pageData.load?.())?.body;
+  if (!MDX) notFound();
   const markdownUrl = `/llms.mdx/docs/${[...page.slugs, "index.mdx"].join("/")}`;
 
   const text = (await page.data.getText?.("processed")) || "";
