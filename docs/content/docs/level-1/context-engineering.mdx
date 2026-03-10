@@ -1,0 +1,406 @@
+---
+title: 告别"碎片化提问"：精准投喂 Context 的艺术
+description: 掌握 Context Engineering，让 AI 理解你的项目规范
+icon: Target
+---
+
+# 为什么 AI 总是"瞎猜"？
+
+:::warning[草案声明]
+本文当前仍处于草案阶段，内容为纯 AI 生成，后续会继续补充实战验证、案例复盘与人工校对。
+:::
+
+你有没有遇到过这样的场景：
+
+你让 Cursor 写一个 API 接口，它生成了这样的代码：
+
+```typescript
+// AI 生成的代码
+app.get('/api/users/:id', (req, res) => {
+    const userId = req.params.id;
+    const user = db.query('SELECT * FROM users WHERE id = ' + userId);
+    res.json(user);
+});
+```
+
+你看了一眼，心里一万个草泥马：
+
+- 为什么用 `app.get` 而不是我项目里的路由框架？
+- 为什么直接拼接 SQL？这不是 SQL 注入吗？
+- 为什么用 `db.query` 而不是我项目里的 ORM？
+- 为什么没有错误处理？
+
+**问题不在 AI 笨，而在你没有告诉它"项目规范"。**
+
+# Context 污染：AI 的"记忆混乱"
+
+## 什么是 Context 污染
+
+Context 污染指的是 AI 的上下文中包含了大量无关或过时的信息，导致它做出错误的判断。
+
+**常见的污染源**：
+
+1. **旧代码**：项目里有大量废弃的代码，AI 会参考这些代码的风格
+2. **依赖库的示例代码**：`node_modules` 里的示例代码会干扰 AI 的判断
+3. **测试文件**：测试代码的风格往往和业务代码不同
+4. **配置文件**：各种 `.config.js` 文件会让 AI 混淆
+
+## 实战案例：为什么 AI 总是用错误的导入路径
+
+**场景**：你的项目使用了路径别名（`@/components`），但 AI 总是生成相对路径（`../../components`）
+
+**原因**：AI 看到了 `node_modules` 里的示例代码，那些代码都用相对路径
+
+**解决方案**：在 `.cursorrules` 中明确规定：
+
+```
+# 导入路径规范
+- 使用路径别名 @/ 而不是相对路径
+- 正确：import Button from '@/components/Button'
+- 错误：import Button from '../../components/Button'
+```
+
+# Context Engineering 的三个层次
+
+## 层次一：项目级规则（.cursorrules / AGENTS.md）
+
+**作用**：定义项目的全局规范和约束
+
+**适用场景**：
+- 代码风格（命名约定、缩进、引号）
+- 技术栈选择（用 Bun 不用 Node、用 Prisma 不用 TypeORM）
+- 禁用的 API 和强推的工具库
+- 文件组织结构
+
+**实战示例**：本项目的 AGENTS.md
+
+让我们看看这个项目的 `AGENTS.md` 是如何定义规则的：
+
+```markdown
+# 术语规范
+- 保持专业英文术语原样（Vibe Coding, Agent, Context Engineering 等）
+- 不生硬翻译
+
+# Git Commit 规范
+- 所有的提交描述必须使用中文
+- 遵守 Angular 提交规范前缀（feat/fix/docs/style/refactor/chore）
+
+# MDX 组件语法规范
+- 必须使用 Fumadocs 官方的 ::: 容器块语法
+- 严禁使用 GitHub 风格的 Markdown Alert 语法（> [!NOTE]）
+- 一级标题使用规范：文章正文应该有多个一级标题（#）
+- 禁止使用 --- 水平分割线
+```
+
+**为什么这样设计**：
+- 避免每次对话都要重新说明规则
+- 让 AI 自动遵守项目规范
+- 发现新问题时，更新 AGENTS.md，后续对话自动生效
+
+## 层次二：工具能力扩展（CLI 优先 + MCP 兜底）
+
+**作用**：让 AI 能够调用外部工具和服务
+
+**核心理念**：
+- AI 不应该被限制在"文本对话"的沙箱里
+- AI 应该能够"看到"和"操作"真实的系统
+- **CLI 工具是最自然的扩展方式**（AI 擅长写命令）
+
+**实战示例**：Claude Code 的工具原语
+
+Claude Code 集成了这些工具：
+
+| 工具 | 作用 | 为什么重要 |
+|------|------|-----------|
+| **Bash** | 执行任何 Shell 命令 | 最灵活，可以调用任何 CLI 工具 |
+| **Read** | 读取文件内容 | 比 `cat` 更易审查 |
+| **Edit** | 手术式修改文件 | 比 `sed` 更精确 |
+| **Write** | 创建新文件 | 比 `echo >` 更清晰 |
+| **Grep** | 搜索文件内容 | 比 `grep` 更结构化 |
+| **Glob** | 搜索文件路径 | 比 `find` 更快速 |
+
+**为什么 Bash 是核心**：
+- 可以调用任何现有的 CLI 工具（git、curl、jq、psql 等）
+- 可以组合多个命令（pipe）
+- AI 本质上就是在"写代码"，命令行就是最简单的代码
+
+:::tip[关键洞察]
+很多团队会先用 CLI 打通主流程，再在需要结构化返回、鉴权和长连接时引入 MCP。OpenClaw 的案例放在上一章"兵器谱"里集中讲，这里不重复展开。
+:::
+
+## 层次三：任务级模板（Skills）
+
+**作用**：封装高频任务的最佳实践
+
+**适用场景**：
+- 生成 Git Commit 消息（`/commit`）
+- 审查 Pull Request（`/review-pr`）
+- 重构代码（`/refactor`）
+- 编写测试（`/test`）
+
+**核心理念**：
+- 高频任务应该被标准化
+- 避免每次都重新描述相同的需求
+- 通过 Skills 封装最佳实践
+
+**实战示例**：`/commit` Skill
+
+当你执行 `/commit` 时，AI 会：
+
+1. 运行 `git status` 查看未提交的文件
+2. 运行 `git diff` 查看具体改动
+3. 分析改动的性质（新功能、修复、重构等）
+4. 生成符合 Angular 规范的 Commit 消息
+5. 询问你是否确认提交
+
+**Skills 与 Context Engineering 的关系**：
+
+- `.cursorrules` / `AGENTS.md`：项目级规则（持久化）
+- MCP：工具能力扩展（可插拔）
+- Skills：任务级模板（可复用）
+
+三者结合，构成了完整的 Context Engineering 体系。
+
+# 手把手：编写高质量的 .cursorrules
+
+## 基本结构
+
+```markdown
+# 项目概述
+简要描述项目的目标、技术栈和架构
+
+# 技术栈
+列出项目使用的核心技术和版本
+
+# 代码规范
+定义命名约定、代码风格、文件组织
+
+# 禁止事项
+明确列出不允许使用的 API、模式或做法
+
+# 强制要求
+明确列出必须遵守的规则和最佳实践
+```
+
+## 实战示例：一个完整的 .cursorrules
+
+```markdown
+# 项目概述
+这是一个基于 Next.js 的博客系统，使用 Prisma + PostgreSQL 作为数据层。
+
+# 技术栈
+- Runtime: Bun (不使用 Node.js)
+- Framework: Next.js 15 (App Router)
+- Database: PostgreSQL + Prisma
+- Styling: Tailwind CSS
+- Testing: Bun test
+
+# 代码规范
+
+## 命名约定
+- 文件名：kebab-case（user-profile.tsx）
+- 组件名：PascalCase（UserProfile）
+- 函数名：camelCase（getUserById）
+- 常量：UPPER_SNAKE_CASE（MAX_RETRY_COUNT）
+
+## 导入路径
+- 使用路径别名 @/ 而不是相对路径
+- 正确：import Button from '@/components/Button'
+- 错误：import Button from '../../components/Button'
+
+## 文件组织
+- 组件放在 src/components/
+- API 路由放在 src/app/api/
+- 数据库模型放在 prisma/schema.prisma
+- 工具函数放在 src/lib/
+
+# 禁止事项
+
+## 数据库操作
+- 禁止直接拼接 SQL（防止 SQL 注入）
+- 禁止使用 any 类型
+- 禁止在客户端组件中直接查询数据库
+
+## 依赖管理
+- 禁止使用 npm/yarn/pnpm，只使用 bun
+- 禁止安装未经审批的依赖
+
+## 代码风格
+- 禁止使用 var，只使用 const/let
+- 禁止使用 == 和 !=，只使用 === 和 !==
+- 禁止使用 any 类型，必须明确类型
+
+# 强制要求
+
+## API 接口
+- 所有 API 必须有错误处理
+- 所有 API 必须有参数校验（使用 Zod）
+- 所有 API 必须返回统一的响应格式：
+  ```typescript
+  { success: boolean, data?: any, error?: string }
+  ```
+
+## 数据库操作
+- 必须使用 Prisma Client
+- 必须使用事务处理多表操作
+- 必须添加适当的索引
+
+## 安全
+- 所有用户输入必须校验和清理
+- 密码必须使用 bcrypt 加密
+- JWT token 必须设置过期时间
+
+## 测试
+- 所有 API 必须有单元测试
+- 测试文件命名：*.test.ts
+- 使用 bun test 运行测试
+```
+
+## 关键技巧
+
+### 技巧一：用"正确 vs 错误"的对比
+
+不要只说"使用路径别名"，而是：
+
+```markdown
+- 正确：import Button from '@/components/Button'
+- 错误：import Button from '../../components/Button'
+```
+
+### 技巧二：明确"为什么"
+
+不要只说"禁止直接拼接 SQL"，而是：
+
+```markdown
+- 禁止直接拼接 SQL（防止 SQL 注入）
+```
+
+### 技巧三：提供具体的代码示例
+
+不要只说"使用统一的响应格式"，而是：
+
+````markdown
+所有 API 必须返回统一的响应格式：
+```typescript
+{ success: boolean, data?: any, error?: string }
+```
+````
+
+# 对比：Claude Code 的系统提示词设计
+
+让我们看看 Claude Code 是如何设计系统约束的：
+
+## Chunked Write Protocol（分块写入协议）
+
+```
+ABSOLUTE LIMITS
+- MAXIMUM 350 LINES per single write/edit operation
+- RECOMMENDED 300 LINES or less
+- NEVER write entire files in one operation if >300 lines
+```
+
+**设计理念**：
+- 明确的数字限制（350 行）
+- 推荐值（300 行）
+- 绝对禁止的行为（NEVER）
+
+**为什么这样设计**：
+- 服务器有 2-3 分钟超时限制
+- 大文件写入会超时失败
+- 分块写入更快更可靠
+
+**对我们的启发**：
+- 规则要具体、可量化
+- 要说明"为什么"（超时问题）
+- 要提供替代方案（分块写入）
+
+## 工具使用规范
+
+```
+Do NOT use Bash when a relevant dedicated tool is provided:
+- To read files use Read instead of cat
+- To edit files use Edit instead of sed
+- To create files use Write instead of echo
+```
+
+**设计理念**：
+- 明确的优先级（专用工具 > Bash）
+- 具体的对比（Read vs cat）
+- 清晰的理由（让用户更好理解和审查）
+
+**对我们的启发**：
+- 用"而不是"的对比方式
+- 说明背后的原因
+- 提供具体的替代方案
+
+# 实战演练：为你的项目编写 Context 规则
+
+## 步骤一：识别项目的核心约束
+
+问自己这些问题：
+
+1. **技术栈**：用什么语言、框架、数据库？
+2. **代码风格**：命名约定是什么？用 Tab 还是空格？
+3. **架构模式**：MVC？分层架构？微服务？
+4. **安全要求**：有哪些安全红线不能碰？
+5. **性能要求**：有哪些性能指标必须满足？
+
+## 步骤二：列出"禁止事项"
+
+这是最重要的部分。明确告诉 AI"什么不能做"：
+
+- 禁止使用的废弃 API
+- 禁止的不安全做法
+- 禁止的性能杀手
+
+## 步骤三：提供"正确示例"
+
+不要只说"不要这样"，还要说"应该这样"：
+
+```markdown
+# 错误处理
+
+❌ 错误做法：
+```typescript
+const user = await db.user.findUnique({ where: { id } });
+return user.name; // 如果 user 为 null 会崩溃
+```
+
+✅ 正确做法：
+```typescript
+const user = await db.user.findUnique({ where: { id } });
+if (!user) {
+  throw new Error('User not found');
+}
+return user.name;
+```
+```
+
+## 步骤四：持续迭代
+
+Context Engineering 不是一次性的工作，而是持续演进的过程：
+
+1. 发现 AI 犯错 → 分析原因 → 更新规则
+2. 项目演进 → 技术栈变化 → 更新规则
+3. 团队反馈 → 规范调整 → 更新规则
+
+# 小结
+
+Context Engineering 是 AI Native 开发的核心能力：
+
+**三个层次**：
+1. 项目级规则（`.cursorrules` / `AGENTS.md`）
+2. 工具能力扩展（MCP）
+3. 任务级模板（Skills）
+
+**核心原则**：
+- 规则要具体、可量化
+- 用"正确 vs 错误"的对比
+- 说明"为什么"
+- 提供具体的代码示例
+- 持续迭代和演进
+
+**关键洞察**：
+同样的 AI 模型，在不同的 Context 约束下，表现天差地别。
+
+下一篇，我们将进入"暗礁"——揭示 AI 在实际应用中的致命缺陷，以及如何建立工程化的防御体系。
