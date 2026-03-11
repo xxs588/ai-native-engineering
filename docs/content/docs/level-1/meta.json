@@ -1,6 +1,10 @@
 {
   "title": "第一篇：破局",
-  "description": "编程范式的第三次跨越",
+  "description": "从范式转移、工具生态位到控制面心智",
   "defaultOpen": true,
-  "pages": ["paradigm-shift", "tooling-landscape", "context-engineering"]
+  "pages": [
+    "paradigm-shift",
+    "tooling-landscape",
+    "control-surface-evolution"
+  ]
 }
