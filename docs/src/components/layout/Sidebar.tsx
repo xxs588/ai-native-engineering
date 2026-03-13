@@ -269,7 +269,9 @@ function SidebarPanelContent({
     <div
       className={cn(
         "card-base flex flex-col overflow-hidden p-4",
-        floating ? "h-full min-h-0" : "min-h-[calc(100vh-9rem)]",
+        floating
+          ? "h-full min-h-0"
+          : "h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] min-h-0",
       )}
     >
       <div className="mb-3 flex items-center justify-between">
@@ -330,7 +332,7 @@ export function Sidebar({ sidebar = {} }: SidebarProps) {
     >
       <div
         id="sidebar-sticky"
-        className="sticky top-4 flex w-full flex-col gap-4 transition-all duration-700"
+        className="sticky top-4 flex w-full flex-col gap-4 transition-all duration-700 onload-animation"
       >
         <SidebarPanelContent sidebar={sidebar} />
       </div>
