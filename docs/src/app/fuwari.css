@@ -265,12 +265,18 @@
     margin-right: 0.5rem;
   }
 
+  .expand-animation {
+    position: relative;
+    z-index: 0;
+  }
+
   .expand-animation::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
     border-radius: inherit;
+    pointer-events: none;
     transform: scale(0.85);
     transition: all 0.2s ease-out;
   }

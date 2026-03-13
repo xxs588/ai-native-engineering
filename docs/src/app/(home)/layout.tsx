@@ -1,6 +1,6 @@
-import { HomeLayout } from "fumadocs-ui/layouts/home";
+import { BookHomeLayout } from "@/components/layout/BookHomeLayout";
 import { baseOptions } from "@/lib/layout.shared";
 
 export default function Layout({ children }: LayoutProps<"/">) {
-  return <HomeLayout {...baseOptions()}>{children}</HomeLayout>;
+  return <BookHomeLayout {...baseOptions()}>{children}</BookHomeLayout>;
 }

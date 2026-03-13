@@ -10,7 +10,7 @@ const normalizedBasePath =
 
 /** @type {import('next').NextConfig} */
 const config = {
-  output: "export",
+  output: isProduction ? "export" : undefined,
   reactStrictMode: true,
   basePath: isProduction ? normalizedBasePath : "",
   assetPrefix:

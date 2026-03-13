@@ -19,6 +19,7 @@ function FuwariLayoutContent({
   nav,
   sidebar,
   githubUrl,
+  links,
 }: Omit<DocsLayoutProps, "tree">) {
   const { collapsed } = useSidebar();
   const [sidebarHoverOpen, setSidebarHoverOpen] = useState(false);
@@ -36,7 +37,7 @@ function FuwariLayoutContent({
           id="navbar-wrapper"
           className="pointer-events-auto sticky top-0 transition-all"
         >
-          <Navbar nav={nav} githubUrl={githubUrl} />
+          <Navbar nav={nav} links={links} githubUrl={githubUrl} />
         </div>
       </div>
 
@@ -89,11 +90,17 @@ export function FuwariLayout({
   nav = {},
   sidebar = {},
   githubUrl,
+  links,
 }: DocsLayoutProps) {
   return (
     <TreeContextProvider tree={tree}>
       <SidebarProvider>
-        <FuwariLayoutContent nav={nav} sidebar={sidebar} githubUrl={githubUrl}>
+        <FuwariLayoutContent
+          nav={nav}
+          sidebar={sidebar}
+          links={links}
+          githubUrl={githubUrl}
+        >
           {children}
         </FuwariLayoutContent>
       </SidebarProvider>

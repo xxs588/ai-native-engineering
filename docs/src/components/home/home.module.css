@@ -1,0 +1,162 @@
+.pageRoot :where(h1, h2, h3, p, a, span, li, strong, svg) {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.pageDescription {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 1.03rem;
+  line-height: 1.85;
+  letter-spacing: 0.003em;
+  color: color-mix(in oklab, var(--deep-text) 64%, transparent);
+}
+
+.bodyText {
+  margin-top: 1rem;
+  max-width: 72ch;
+  font-size: 1rem;
+  line-height: 1.9;
+  letter-spacing: 0.003em;
+  color: color-mix(in oklab, var(--deep-text) 72%, transparent);
+}
+
+.sectionDivider {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--line-divider);
+}
+
+.eyebrow {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--primary) 78%, transparent);
+}
+
+.sectionDescription {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 1rem;
+  line-height: 1.85;
+  letter-spacing: 0.003em;
+  color: color-mix(in oklab, var(--deep-text) 66%, transparent);
+}
+
+.dashedPanel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px dashed var(--line-divider);
+  background: var(--license-block-bg);
+  padding: 1.25rem 1.5rem;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.panelTitle {
+  display: block;
+  color: var(--deep-text);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.panelDescription {
+  display: block;
+  color: color-mix(in oklab, var(--deep-text) 68%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line-divider);
+  padding: 0.28rem 0.65rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: color-mix(in oklab, var(--deep-text) 62%, transparent);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.listItem + .listItem {
+  margin-top: 0.75rem;
+}
+
+.listBullet {
+  width: 0.375rem;
+  height: 0.375rem;
+  margin-top: 0.8rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.listText {
+  color: color-mix(in oklab, var(--deep-text) 72%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
+
+.stepCard {
+  display: flex;
+  gap: 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px dashed var(--line-divider);
+  background: color-mix(in oklab, var(--card-bg) 75%, transparent);
+  padding: 0.875rem 1rem;
+}
+
+.stepBadge {
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: var(--btn-regular-bg);
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.stepTitle {
+  color: var(--deep-text);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.stepDescription {
+  margin-top: 0.25rem;
+  color: color-mix(in oklab, var(--deep-text) 66%, transparent);
+  font-size: 0.94rem;
+  line-height: 1.8;
+}
+
+.ctaText {
+  color: color-mix(in oklab, var(--deep-text) 70%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
