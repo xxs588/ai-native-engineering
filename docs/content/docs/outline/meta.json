@@ -1,0 +1,9 @@
+{
+  "title": "全书大纲",
+  "description": "先看收敛版导览，再看详细版章节设计",
+  "defaultOpen": true,
+  "pages": [
+    "overview",
+    "detailed-outline"
+  ]
+}

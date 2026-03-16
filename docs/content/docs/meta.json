@@ -1,11 +1,13 @@
 {
   "title": "AI 原生工程",
   "pages": [
-    "00-preface",
+    "preface",
+    "outline",
     "01-breakthrough",
     "02-foundation",
     "03-development",
     "04-delivery",
-    "05-scale"
+    "05-scale",
+    "notes"
   ]
 }

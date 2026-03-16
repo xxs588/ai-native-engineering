@@ -28,15 +28,19 @@ const aliasSlugs = [
 
 function resolvePageFromSlug(slug?: string[]) {
   if (!slug || slug.length === 0) {
-    return source.getPage(["00-preface"]);
+    return source.getPage(["preface"]);
   }
 
-  return source.getPage(slug) ?? source.getPage([...slug, "00-overview"]);
+  return (
+    source.getPage(slug) ??
+    source.getPage([...slug, "00-overview"]) ??
+    source.getPage([...slug, "overview"])
+  );
 }
 
 function getMarkdownSegments(slugs: string[]) {
   const last = slugs.at(-1);
-  if (!last) return ["00-preface.mdx"];
+  if (!last) return ["preface.mdx"];
 
   return [...slugs.slice(0, -1), `${last}.mdx`];
 }

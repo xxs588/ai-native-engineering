@@ -115,10 +115,8 @@ export const readingSteps = [
 
 export function getHomePageData(): HomePageData {
   const pages = source.getPages();
-  const preface = source.getPage(["00-preface"]);
-  const contentPages = pages.filter(
-    (page) => page.slugs.at(-1) !== "00-overview",
-  );
+  const preface = source.getPage(["preface"]);
+  const outline = source.getPage(["outline", "overview"]);
 
   const parts = partDefinitions
     .map((definition) => {
@@ -151,6 +149,13 @@ export function getHomePageData(): HomePageData {
           url: getCanonicalPageUrl(preface.url),
         }
       : null,
+    outline
+      ? {
+          title: outline.data.title,
+          description: outline.data.description ?? "",
+          url: getCanonicalPageUrl(outline.url),
+        }
+      : null,
     ...parts.map((part) => ({
       title: part.title,
       description: part.highlight,
@@ -162,7 +167,7 @@ export function getHomePageData(): HomePageData {
     entryUrl,
     firstPartUrl: parts[0]?.url ?? "/docs",
     totalParts: parts.length,
-    totalChapters: contentPages.length,
+    totalChapters: parts.reduce((sum, part) => sum + part.chapterCount, 0),
     parts,
     quickLinks,
   };

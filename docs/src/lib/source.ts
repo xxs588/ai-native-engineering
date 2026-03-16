@@ -14,16 +14,22 @@ type DocsPageTreeItem = Extract<DocsPageTreeNode, { type: "page" }>;
 type DocsPageTreeFolder = Extract<DocsPageTreeNode, { type: "folder" }>;
 
 export function getCanonicalPageUrl(url: string) {
-  if (url === "/docs/00-preface") return "/docs";
+  if (url === "/docs/preface") return "/docs";
   if (url.endsWith("/00-overview")) {
     return url.slice(0, -"/00-overview".length);
+  }
+  if (url.endsWith("/overview")) {
+    return url.slice(0, -"/overview".length);
   }
 
   return url;
 }
 
 function isOverviewPage(node: DocsPageTreeNode): node is DocsPageTreeItem {
-  return node.type === "page" && node.url.endsWith("/00-overview");
+  return (
+    node.type === "page" &&
+    (node.url.endsWith("/00-overview") || node.url.endsWith("/overview"))
+  );
 }
 
 function normalizeFolderNode(node: DocsPageTreeFolder): DocsPageTreeFolder {

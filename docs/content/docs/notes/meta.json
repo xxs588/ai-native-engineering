@@ -1,0 +1,9 @@
+{
+  "title": "分享与杂记",
+  "description": "收纳不直接并入正文主线的分享稿、杂记与阶段性材料",
+  "defaultOpen": true,
+  "pages": [
+    "overview",
+    "ai-native-engineering-share"
+  ]
+}
