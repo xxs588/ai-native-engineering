@@ -1,0 +1,154 @@
+---
+title: 我是怎么把这个项目接入 AI CI/CD 的
+description: 一次单人文档项目的真实改造记录：从“本地看起来没问题”到“线上可验证、可拦截、可追踪”
+icon: Bot
+full: false
+---
+
+# 我不是在搭大平台，我是在救一个单人写书项目的上线体验
+
+这个项目是一本持续更新的书，改动主要集中在两类：
+
+- 文章内容持续续写。
+- 页面样式和结构持续微调。
+
+问题也很典型：
+
+- 本地看起来没事，线上预览一打开就有细节炸掉。
+- 链接、排版、元数据这种“读者第一眼就能看到”的问题，不一定能靠编译报错发现。
+
+所以我这次改造，不是想炫一套“复杂平台”，而是想把最关键的一件事落地：
+
+**每次改动都在真实部署环境里被检查，而不是只在本地自我感觉良好。**
+
+# 改造前最痛的地方，不在代码能不能跑，而在结果可不可信
+
+改造前的核心痛点其实就两句：
+
+- 本地验证和线上结果不一致。
+- 失败后很难快速复现和定位。
+
+这对单人项目特别伤，因为没人帮你兜底。你今天改一点样式，明天补一段内容，后天又加一个组件，回头看线上才发现某个章节在移动端横向溢出，或者某个内部链接已经挂了。
+
+这类问题不会每次都在 `lint`、`build` 里喊出来，但读者一进页面就能看到。
+
+# 我最后把流程收敛成三条线
+
+我把这套 CI/CD 分成三条职责明确的工作流：
+
+- `Quality Gate`
+- `Netlify Preview Guard`
+- `Netlify Production Guard`
+
+对应文件是：
+
+- `.github/workflows/quality-gate.yml`
+- `.github/workflows/netlify-preview-guard.yml`
+- `.github/workflows/netlify-production-guard.yml`
+
+这三条线各干一件事，不重叠。
+
+# 第一条线：Quality Gate 只做基线闸门
+
+`Quality Gate` 的职责很克制，只管基础正确性：
+
+- `lint`
+- `format check`
+- `typecheck`
+- `build`
+- 大改动但没补 `docs/tests/` 时直接拦截
+
+这条线的意义是：先把“连最基本规范都不满足”的改动挡在外面。
+
+# 第二条线：Netlify Preview Guard 负责 PR 阶段真实巡检
+
+这条线才是我这次改造的核心。
+
+PR 打开后，它会做三步关键动作：
+
+1. 根据 changed files 推导本次重点检查路径（点对点，不是盲扫全站）。
+2. 解析并等待 Netlify Deploy Preview URL 就绪。
+3. 用 Playwright 直接打这个预览 URL 跑 smoke。
+
+也就是说，这里检查的不是你本地的 `localhost`，而是“PR 对应的真实线上预览结果”。
+
+失败后会自动上传：
+
+- `playwright-report`
+- `test-results`
+
+这两份产物对排障非常关键。
+
+# 第三条线：Netlify Production Guard 做合并后复查
+
+PR 过了不代表万无一失，所以合并到 `main` 后还会再跑一轮生产巡检。
+
+它会读取生产 URL（手动输入、仓库变量或配置文件来源），然后同样用 Playwright 执行线上 smoke。失败时会沉淀 issue 与 run 信息，避免问题“只在聊天里提过，但没有被追踪”。
+
+# 我在代码里具体改了什么
+
+为了让这三条线真正跑起来，我同步调整了下面这些文件：
+
+- `docs/playwright.config.ts`
+- `docs/tests/e2e/production-smoke.spec.ts`
+- `docs/scripts/derive-changed-doc-paths.mjs`
+- `docs/src/lib/site-url.ts`
+- `docs/src/lib/source.ts`
+- `docs/src/app/layout.tsx`
+
+核心思路是把 Playwright 默认目标收敛到 Netlify URL，并把变更路径推导、站点地址生成、元数据来源统一起来，减少“环境不同导致的假问题”。
+
+# 现在一条改动从提交到验收，真实会发生什么
+
+如果我今天改了 `docs/`，推到 PR，流程是这样的：
+
+1. `Quality Gate` 先跑基线。
+2. `Netlify Preview Guard` 跑预览巡检。
+3. 如果通过，PR 可以继续走合并流程。
+4. 合并后 `Netlify Production Guard` 对生产站点复查。
+
+这就是“改动前有闸门，改动后有复查”的双保险。
+
+# 我日常怎么使用这套流程
+
+我自己的使用方式非常简单：
+
+1. 在分支里改文档或样式。
+2. 发 PR 到 `main`。
+3. 重点看两个结果：
+
+- `Quality Gate`
+- `preview-smoke`
+
+4. 如果 `preview-smoke` 失败，第一时间下载 artifact 看 trace/screenshot/video，不凭感觉瞎改。
+
+我本地复现线上问题时也只用线上 URL：
+
+```bash
+cd docs
+E2E_BASE_URL=https://<your-preview>.netlify.app \
+E2E_TARGET_PATHS=/docs/02-foundation \
+bunx playwright test tests/e2e/production-smoke.spec.ts --config=playwright.config.ts
+```
+
+# 这次改造最实在的变化
+
+改完之后，最直接的变化不是“看起来更高级”，而是下面三件事：
+
+- 问题更早暴露：PR 阶段就能在线上预览里被拦住。
+- 定位更快：失败产物可追踪，不用靠猜。
+- 结果更可信：验收基于 Netlify 部署结果，而不是本地偶然状态。
+
+# 这套东西的边界我也讲清楚
+
+这次我做的是“检测闭环”和“可追踪闭环”，不是“自动修复闭环”。
+
+当前仓库内有 webhook 接入位，但没有内置外部修复执行器。所以它现在可以做到：
+
+- 自动检查
+- 自动拦截
+- 自动留证据
+
+但不会凭空自动改代码并提交 PR。
+
+这点我在交接时会明确告诉作者，避免预期错位。
