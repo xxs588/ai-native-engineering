@@ -160,3 +160,10 @@
    - 对 `docs/` 相关代码改动，默认先过 PR 质量闸门再允许合并/部署：至少包含基线回归（lint/typecheck/build）和变更点回归（基于 changed files 的点对点 Playwright 路径检测）。
    - 当改动规模达到“大改动”阈值时，若没有补充或更新 `docs/tests/` 测试脚本，应默认拦截并要求补测，避免只跑旧用例。
    - 在“基线回归 + 变更点回归 + 线上巡检”都通过后，agent 才进入“是否需要优化/扩充测试资产”的决策阶段，并把必要的测试更新纳入同次变更闭环。
+20. **PR 阶段主动线上预览巡检（Agent 必须打 Netlify Preview）**
+   - 对 `docs/` 相关改动，PR 阶段 Playwright 默认只对 Netlify Deploy Preview URL 执行点对点巡检，不再维护本地 webServer smoke 路径。
+   - Deploy Preview 巡检默认基于 changed files 推导目标路径（点对点），并复用 `docs/tests/e2e/production-smoke.spec.ts`；失败必须上传 trace/screenshot/video artifact。
+   - 当触发“大改动但未更新测试”拦截时，若已配置 `AI_TEST_EVOLUTION_WEBHOOK`，应同步触发外部 agent 的补测流程；未配置时至少在 CI Summary 明确提示需要补测。
+21. **本地与线上职责分离（降维护成本）**
+   - `Quality Gate` 只负责 PR 阶段基线闸门（lint/typecheck/build + 大改动补测约束），Playwright 不再在本地构建态重复执行。
+   - Playwright 检查职责集中在 `Netlify Preview Guard`（PR）与 `Netlify Production Guard`（main/手动），以部署结果作为唯一验收真相。

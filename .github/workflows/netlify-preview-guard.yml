@@ -1,0 +1,150 @@
+name: Netlify Preview Guard
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - 'docs/**'
+      - '.github/workflows/netlify-preview-guard.yml'
+      - 'docs/scripts/derive-changed-doc-paths.mjs'
+      - 'docs/tests/e2e/production-smoke.spec.ts'
+      - 'docs/playwright.config.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: read
+
+concurrency:
+  group: netlify-preview-guard-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview-smoke:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Detect changed files and derive target paths
+        id: changes
+        run: |
+          set -euo pipefail
+
+          if [ '${{ github.event_name }}' = 'pull_request' ]; then
+            base_sha='${{ github.event.pull_request.base.sha }}'
+            head_sha='${{ github.event.pull_request.head.sha }}'
+          else
+            base_sha=$(git rev-parse HEAD~1)
+            head_sha=$(git rev-parse HEAD)
+          fi
+
+          git diff --name-only "$base_sha" "$head_sha" | sed '/^[[:space:]]*$/d' > /tmp/changed_files.txt
+          targets=$(bun docs/scripts/derive-changed-doc-paths.mjs --from-file /tmp/changed_files.txt)
+
+          echo "targets=$targets" >> "$GITHUB_OUTPUT"
+          echo "- Targeted E2E paths: \`$targets\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Resolve Netlify deploy preview URL
+        id: preview
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.payload.pull_request?.head?.sha || context.sha;
+
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+            for (let attempt = 1; attempt <= 30; attempt++) {
+              const { data } = await github.request(
+                'GET /repos/{owner}/{repo}/commits/{ref}/check-runs',
+                {
+                  owner,
+                  repo,
+                  ref: sha,
+                  headers: {
+                    'X-GitHub-Api-Version': '2022-11-28',
+                  },
+                },
+              );
+
+              const match = data.check_runs.find((run) => {
+                const url = run.details_url || '';
+                return run.app?.slug === 'netlify' && /deploy-preview-\d+--.+\.netlify\.app/.test(url);
+              });
+
+              if (match?.details_url) {
+                core.info(`Resolved preview URL on attempt ${attempt}: ${match.details_url}`);
+                core.setOutput('url', match.details_url);
+                return;
+              }
+
+              core.info(`Netlify preview URL not found yet (attempt ${attempt}/30), waiting 20s...`);
+              await sleep(20_000);
+            }
+
+            core.setFailed('Failed to resolve Netlify deploy preview URL within 10 minutes.');
+
+      - name: Wait for preview readiness
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          set -euo pipefail
+          target="$PREVIEW_URL/docs/02-foundation"
+
+          for attempt in $(seq 1 40); do
+            status=$(curl -sS -o /tmp/netlify-preview-smoke.html -w '%{http_code}' "$target" || echo 000)
+            echo "Attempt $attempt/40 => $status"
+
+            if [ "$status" = '200' ]; then
+              echo "Preview is ready at $target"
+              exit 0
+            fi
+
+            sleep 15
+          done
+
+          echo "::error::Preview was not ready within 10 minutes: $target"
+          exit 1
+
+      - name: Install deps (docs)
+        working-directory: docs
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browser
+        working-directory: docs
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run smoke tests against Netlify preview
+        working-directory: docs
+        env:
+          E2E_BASE_URL: ${{ steps.preview.outputs.url }}
+          NEXT_PUBLIC_SITE_URL: ${{ steps.preview.outputs.url }}
+          E2E_TARGET_PATHS: ${{ steps.changes.outputs.targets }}
+        run: bunx playwright test tests/e2e/production-smoke.spec.ts --config=playwright.config.ts
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-netlify-preview-${{ github.run_id }}
+          path: |
+            docs/playwright-report
+            docs/test-results
+          if-no-files-found: warn
