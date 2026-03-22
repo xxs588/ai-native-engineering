@@ -1,7 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const remoteBaseURL = process.env.E2E_BASE_URL;
-const useRemoteBaseURL = Boolean(remoteBaseURL);
+
+if (!remoteBaseURL) {
+  throw new Error(
+    "E2E_BASE_URL is required. Playwright smoke checks now run against Netlify URLs only.",
+  );
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -16,7 +21,7 @@ export default defineConfig({
       ]
     : "list",
   use: {
-    baseURL: remoteBaseURL ?? "http://127.0.0.1:3000/ai-native-engineering",
+    baseURL: remoteBaseURL,
     headless: true,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
@@ -30,12 +35,4 @@ export default defineConfig({
       },
     },
   ],
-  webServer: useRemoteBaseURL
-    ? undefined
-    : {
-        command: "bun run start:e2e",
-        reuseExistingServer: !process.env.CI,
-        timeout: 60_000,
-        url: "http://127.0.0.1:3000/ai-native-engineering/e2e/copy-markdown",
-      },
 });
