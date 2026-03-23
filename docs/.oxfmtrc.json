@@ -10,7 +10,7 @@
       "files": ["content/**/*.md", "content/**/*.mdx"],
       "options": {
         "printWidth": 80,
-        "proseWrap": "always"
+        "proseWrap": "preserve"
       }
     }
   ]
