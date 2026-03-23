@@ -78,6 +78,19 @@ for (const file of files) {
       `OG image URL in ${file} is missing the expected base path: ${ogImage}`,
     );
   }
+
+  const copyrightLink = extractValue(
+    html,
+    /<a href="([^"]+)" class="max-w-full truncate text-fd-primary underline"/,
+    "copyright link",
+    file,
+  );
+
+  if (!copyrightLink.startsWith(`${normalizedBasePath}/docs`)) {
+    throw new Error(
+      `Copyright link in ${file} is missing the expected docs base path: ${copyrightLink}`,
+    );
+  }
 }
 
 console.log(`Verified static metadata for ${files.length} docs pages.`);

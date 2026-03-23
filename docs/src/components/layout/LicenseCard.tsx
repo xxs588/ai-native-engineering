@@ -4,6 +4,7 @@ import { Check, Copy, CreativeCommons, Share2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { withDocsBasePath } from "@/lib/docs-base-path";
 
 type LicenseCardProps = {
   title: string;
@@ -12,13 +13,14 @@ type LicenseCardProps = {
 
 export function LicenseCard({ title, updatedAt }: LicenseCardProps) {
   const pathname = usePathname();
+  const pagePath = useMemo(() => withDocsBasePath(pathname), [pathname]);
   const [fullUrl, setFullUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setFullUrl(`${window.location.origin}${pathname}`);
-  }, [pathname]);
+    setFullUrl(`${window.location.origin}${pagePath}`);
+  }, [pagePath]);
 
   const updated = updatedAt
     ? (() => {
@@ -29,10 +31,10 @@ export function LicenseCard({ title, updatedAt }: LicenseCardProps) {
         return `${year}-${month}-${day}`;
       })()
     : "长期维护";
-  const linkText = useMemo(() => fullUrl || pathname, [fullUrl, pathname]);
+  const linkText = useMemo(() => fullUrl || pagePath, [fullUrl, pagePath]);
 
   const share = async () => {
-    const shareUrl = fullUrl || pathname;
+    const shareUrl = fullUrl || pagePath;
     try {
       if (navigator.share) {
         await navigator.share({
@@ -57,7 +59,7 @@ export function LicenseCard({ title, updatedAt }: LicenseCardProps) {
       </div>
       <div className="mt-1 flex items-center gap-2 text-sm pr-22">
         <a
-          href={fullUrl || pathname}
+          href={fullUrl || pagePath}
           className="max-w-full truncate text-fd-primary underline"
           target="_blank"
           rel="noreferrer"
@@ -110,7 +112,7 @@ export function LicenseCard({ title, updatedAt }: LicenseCardProps) {
           size="smText"
           animated={false}
           onClick={async () => {
-            const shareUrl = fullUrl || pathname;
+            const shareUrl = fullUrl || pagePath;
             try {
               await navigator.clipboard.writeText(shareUrl);
               setCopied(true);
