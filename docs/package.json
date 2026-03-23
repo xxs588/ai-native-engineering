@@ -9,6 +9,7 @@
     "start": "serve out",
     "start:e2e": "node ./scripts/serve-export-for-playwright.mjs",
     "test:e2e": "playwright test",
+    "verify:static-metadata": "node ./scripts/check-static-docs-metadata.mjs",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "biome check",

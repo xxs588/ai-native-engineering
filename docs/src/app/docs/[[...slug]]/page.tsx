@@ -202,7 +202,7 @@ export async function generateMetadata(
     title: page.data.title,
     description: page.data.description,
     alternates: {
-      canonical: getCanonicalPageUrl(page.url),
+      canonical: withDocsBasePath(getCanonicalPageUrl(page.url)),
     },
     openGraph: {
       images: getPageImage(page).url,
