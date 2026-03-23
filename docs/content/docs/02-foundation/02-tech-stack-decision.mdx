@@ -52,14 +52,14 @@ icon: Cpu
 
 我更认同的拆法是：
 
-| 层面 | 推荐方案 | 定位 |
-|---|---|---|
-| 桌面端 | `Tauri 2 + React + TypeScript + Vite` | 完整体验主战场，负责系统能力接入 |
-| 移动端 | `Expo + React Native + Expo Router + Expo Modules API` | 完整体验主战场，负责成熟原生生态 |
-| Web 端 | `React + Vite + PWA` | 轻量陪伴端，负责安装、查看、基础互动 |
-| API 层 | `NestJS + Fastify` | 统一业务入口，对外提供 `REST + WebSocket events` |
-| Worker 层 | `BullMQ worker + Agent runtime` | 异步任务、AI 任务、通知和编排 |
-| 数据层 | `PostgreSQL + Redis + MinIO` | 结构化数据、短时态状态、对象存储 |
+| 层面      | 推荐方案                                               | 定位                                             |
+| --------- | ------------------------------------------------------ | ------------------------------------------------ |
+| 桌面端    | `Tauri 2 + React + TypeScript + Vite`                  | 完整体验主战场，负责系统能力接入                 |
+| 移动端    | `Expo + React Native + Expo Router + Expo Modules API` | 完整体验主战场，负责成熟原生生态                 |
+| Web 端    | `React + Vite + PWA`                                   | 轻量陪伴端，负责安装、查看、基础互动             |
+| API 层    | `NestJS + Fastify`                                     | 统一业务入口，对外提供 `REST + WebSocket events` |
+| Worker 层 | `BullMQ worker + Agent runtime`                        | 异步任务、AI 任务、通知和编排                    |
+| 数据层    | `PostgreSQL + Redis + MinIO`                           | 结构化数据、短时态状态、对象存储                 |
 
 这套拆法的核心不是“平台越多越炫”，而是：**每一层都承认自己最擅长解决什么问题。**
 

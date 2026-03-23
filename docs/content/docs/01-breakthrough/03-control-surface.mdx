@@ -337,13 +337,13 @@ GitHub 高度相关的项目也是一样。把 label 语义、PR checklist、com
 还是拿路径别名这个例子说。项目明明统一要求用：
 
 ```ts
-import Button from '@/components/Button'
+import Button from "@/components/Button";
 ```
 
 结果 AI 还是给你写成：
 
 ```ts
-import Button from '../../components/Button'
+import Button from "../../components/Button";
 ```
 
 这时候问题未必是“它没看到规则”，更可能是：
@@ -619,6 +619,7 @@ Martin Fowler 在 [`Harness Engineering`](https://martinfowler.com/articles/expl
 让 agent 有一个稳定、可隔离、可恢复的工作现场。
 
 例如：
+
 - worktree / container / sandbox
 - permissions / approvals
 - session state
@@ -629,6 +630,7 @@ Martin Fowler 在 [`Harness Engineering`](https://martinfowler.com/articles/expl
 让 agent 不只是看见代码，还能看见运行后的世界。
 
 例如：
+
 - browser / CDP
 - screenshots / video
 - logs / metrics / traces
@@ -639,6 +641,7 @@ Martin Fowler 在 [`Harness Engineering`](https://martinfowler.com/articles/expl
 把“做对了没有”尽量交给确定性检查，而不是情绪判断。
 
 例如：
+
 - tests
 - CI
 - linters
@@ -650,6 +653,7 @@ Martin Fowler 在 [`Harness Engineering`](https://martinfowler.com/articles/expl
 让系统在失败、漂移、重复犯错之后，不是越来越烂，而是越来越稳。
 
 例如：
+
 - review loop
 - background cleanup agents
 - doc gardening
@@ -728,11 +732,11 @@ Martin Fowler 在 [`Harness Engineering`](https://martinfowler.com/articles/expl
 
 到这里，其实就能把三层关系说得很清楚了。
 
-| 层级 | 它回答的问题 | 典型载体 | 没有它会怎样 |
-|---|---|---|---|
-| `Prompt Engineering` | 这次要 AI 干什么 | Prompt、任务描述、验收要求 | AI 连目标都说不清 |
-| `Context Engineering` | AI 在什么信息约束下干 | `AGENTS.md`、`Specs`、`Skills`、设计稿、日志、检索结果 | AI 会乱猜、乱引用、乱实现 |
-| `Agent Harness` | AI 怎么稳定地干并验证结果 | CLI、MCP、hooks、Actions、cloud tasks、CI、sandbox、observability | AI 能说不能稳，能跑不能收敛 |
+| 层级                  | 它回答的问题              | 典型载体                                                          | 没有它会怎样                |
+| --------------------- | ------------------------- | ----------------------------------------------------------------- | --------------------------- |
+| `Prompt Engineering`  | 这次要 AI 干什么          | Prompt、任务描述、验收要求                                        | AI 连目标都说不清           |
+| `Context Engineering` | AI 在什么信息约束下干     | `AGENTS.md`、`Specs`、`Skills`、设计稿、日志、检索结果            | AI 会乱猜、乱引用、乱实现   |
+| `Agent Harness`       | AI 怎么稳定地干并验证结果 | CLI、MCP、hooks、Actions、cloud tasks、CI、sandbox、observability | AI 能说不能稳，能跑不能收敛 |
 
 如果要把这张表压缩成一句话，那就是：
 
@@ -950,6 +954,7 @@ AI 的实现会明显更贴项目。
 这时候，Part 1 才算真的从“破局”走到了“收束”。
 
 :::important[延伸阅读]
+
 - OpenAI：[`Harness engineering: leveraging Codex in an agent-first world`](https://openai.com/index/harness-engineering/)
 - OpenAI：[`Unlocking the Codex harness: how we built the App Server`](https://openai.com/index/unlocking-the-codex-harness/)
 - OpenAI：[`Unrolling the Codex agent loop`](https://openai.com/index/unrolling-the-codex-agent-loop/)
