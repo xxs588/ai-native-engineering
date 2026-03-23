@@ -96,6 +96,11 @@ bun run start
 - 如果后面要接自定义域名、canonical、社交分享图或线上巡检，再补 `NEXT_PUBLIC_SITE_URL`
 - 如果后面要接 `deploy-succeeded -> GitHub Actions` 这类自动验收，再补 `GITHUB_DISPATCH_TOKEN`
 
+仓库现在也预留了这条自动验收链路：
+
+- Netlify `deploy-succeeded` event function 会在 `production` 和 `deploy-preview` 场景下自动触发 GitHub Actions
+- GitHub Actions 会对当前 deploy URL 跑一套轻量 Playwright smoke，重点校验正文页可达、元信息不泄漏 `localhost`、`View as Markdown` 走 inline 文本查看
+
 如果现在只是先把文档站部署起来，现有这份配置已经够用了。
 
 ## 内容组织约定

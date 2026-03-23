@@ -1,0 +1,100 @@
+name: Netlify Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_url:
+        description: Netlify deploy URL to smoke test
+        required: true
+        type: string
+      deploy_context:
+        description: Netlify deploy context
+        required: false
+        default: deploy-preview
+        type: string
+      site_name:
+        description: Netlify site name
+        required: false
+        default: ai-native-engineering
+        type: string
+      branch:
+        description: Source branch that triggered the deploy
+        required: false
+        default: main
+        type: string
+      commit_ref:
+        description: Commit SHA associated with the deploy
+        required: false
+        default: ""
+        type: string
+      deploy_id:
+        description: Netlify deploy id
+        required: false
+        default: ""
+        type: string
+      review_id:
+        description: Netlify review id for deploy previews
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: netlify-smoke-${{ github.event.inputs.site_name || 'site' }}-${{ github.event.inputs.deploy_context || 'context' }}-${{ github.event.inputs.review_id || github.event.inputs.branch || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Summarize dispatch inputs
+        run: |
+          {
+            echo "### Netlify Smoke Inputs"
+            echo "- Deploy URL: ${{ github.event.inputs.deploy_url }}"
+            echo "- Context: ${{ github.event.inputs.deploy_context }}"
+            echo "- Site: ${{ github.event.inputs.site_name }}"
+            echo "- Branch: ${{ github.event.inputs.branch }}"
+            echo "- Commit: ${{ github.event.inputs.commit_ref }}"
+            echo "- Deploy ID: ${{ github.event.inputs.deploy_id }}"
+            echo "- Review ID: ${{ github.event.inputs.review_id }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install deps (docs)
+        working-directory: docs
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browser
+        working-directory: docs
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run Netlify smoke tests
+        working-directory: docs
+        env:
+          CI: true
+          E2E_BASE_URL: ${{ github.event.inputs.deploy_url }}
+        run: bun run test:e2e:netlify
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-netlify-smoke-${{ github.run_id }}
+          path: |
+            docs/playwright-report
+            docs/test-results
+          if-no-files-found: warn

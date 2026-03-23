@@ -25,7 +25,8 @@ export async function GET(
 
   return new Response(await getLLMText(page), {
     headers: {
-      "Content-Type": "text/markdown",
+      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Disposition": "inline",
     },
   });
 }

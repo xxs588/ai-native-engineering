@@ -8,7 +8,8 @@ This fixture proves the built copy flow can read and write markdown content.
 export function GET() {
   return new Response(markdown, {
     headers: {
-      "Content-Type": "text/markdown",
+      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Disposition": "inline",
     },
   });
 }
