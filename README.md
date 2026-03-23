@@ -1,5 +1,7 @@
 # AI 原生工程：Vibe Coding 进阶与全域自动化落地
 
+[![Netlify Status](https://img.shields.io/website?url=https%3A%2F%2Fai-native-engineering.netlify.app&up_message=online&down_message=offline&up_color=00C7B7&down_color=ef4444&style=flat-square&label=Netlify&logo=netlify&logoColor=white)](https://ai-native-engineering.netlify.app)
+
 这不是一本“AI 工具大全”，也不是把一堆新名词摊开讲一遍的科普手册。
 
 这个仓库真正想做的，是把 AI 编程从“偶尔好用的外挂”，写成一套能做大项目、能持续交付、出了问题也知道怎么兜底的工程工作流。
@@ -79,6 +81,22 @@ bun run start
 - `bun run types:check`：生成类型并做 TypeScript 校验。
 - `bun run build`：执行静态构建。
 - `bun run start`：基于 `out` 目录预览静态产物。
+
+## Netlify 部署
+
+仓库根目录已经补了 `netlify.toml`，Netlify 导入这个仓库时会直接：
+
+- 把 `docs/` 识别成实际构建目录
+- 用 `bun install --frozen-lockfile && bun run build` 构建
+- 发布 `docs/out` 里的静态产物
+- 默认把 `NEXT_PUBLIC_BASE_PATH` 固定为根路径 `/`，避免沿用 GitHub Pages 风格的仓库名前缀
+
+第一次部署完成后，建议再去 Netlify 后台补两类配置：
+
+- 如果后面要接自定义域名、canonical、社交分享图或线上巡检，再补 `NEXT_PUBLIC_SITE_URL`
+- 如果后面要接 `deploy-succeeded -> GitHub Actions` 这类自动验收，再补 `GITHUB_DISPATCH_TOKEN`
+
+如果现在只是先把文档站部署起来，现有这份配置已经够用了。
 
 ## 内容组织约定
 
