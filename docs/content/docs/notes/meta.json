@@ -4,6 +4,7 @@
   "defaultOpen": true,
   "pages": [
     "overview",
-    "ai-native-engineering-share"
+    "ai-native-engineering-share",
+    "multi-agent"
   ]
 }
