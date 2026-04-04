@@ -1,6 +1,16 @@
+import {
+  ImageZoom,
+  type ImageZoomProps,
+} from "fumadocs-ui/components/image-zoom";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
-import { Children, createElement, isValidElement, type ReactNode } from "react";
+import {
+  Children,
+  type ComponentProps,
+  createElement,
+  isValidElement,
+  type ReactNode,
+} from "react";
 import { MdxCallout } from "./components/mdx-callout";
 import { Mermaid } from "./components/mdx-mermaid";
 
@@ -74,6 +84,10 @@ function MdxListItem({ children, className, ...props }: ListItemProps) {
   );
 }
 
+function MdxImage(props: ComponentProps<"img">) {
+  return createElement(ImageZoom, props as ImageZoomProps);
+}
+
 function createHeading(level: HeadingLevel) {
   return function Heading({ children, id, ...props }: HeadingProps) {
     const items = Children.toArray(children);
@@ -142,6 +156,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     h4: createHeading("h4"),
     h5: createHeading("h5"),
     h6: createHeading("h6"),
+    img: MdxImage,
     li: MdxListItem,
     Callout: MdxCallout,
     Mermaid,

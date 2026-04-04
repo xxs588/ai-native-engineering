@@ -430,6 +430,23 @@
   border-radius: 0.75rem;
 }
 
+.customMd [data-rmiz] {
+  display: block;
+  width: 100%;
+}
+
+.customMd [data-rmiz-content] {
+  display: block;
+  width: 100%;
+}
+
+.customMd [data-rmiz-content] img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: none;
+}
+
 .customMd iframe {
   margin-inline: auto;
   max-width: 100%;
