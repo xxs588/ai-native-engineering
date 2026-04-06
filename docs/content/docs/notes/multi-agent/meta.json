@@ -1,0 +1,9 @@
+{
+  "title": "MultiAgent",
+  "description": "收纳 MultiAgent 主题下的资料版正文与可直接口播的讲稿",
+  "defaultOpen": true,
+  "pages": [
+    "overview",
+    "talk"
+  ]
+}
