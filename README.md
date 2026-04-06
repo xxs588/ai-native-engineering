@@ -1,6 +1,9 @@
 # AI 原生工程：Vibe Coding 进阶与全域自动化落地
 
-[![GitHub Stars](https://img.shields.io/github/stars/TatsukiMeng/ai-native-engineering?style=flat-square&logo=github&label=Stars)](https://github.com/TatsukiMeng/ai-native-engineering/stargazers)[![Netlify Status](https://img.shields.io/website?url=https%3A%2F%2Fai-native-engineering.netlify.app&up_message=online&down_message=offline&up_color=00C7B7&down_color=ef4444&style=flat-square&label=Netlify&logo=netlify&logoColor=white)](https://ai-native-engineering.netlify.app)
+[![GitHub Stars](https://img.shields.io/github/stars/TatsukiMeng/ai-native-engineering?style=flat-square&logo=github&label=Stars)](https://github.com/TatsukiMeng/ai-native-engineering/stargazers) [![Netlify Status](https://img.shields.io/website?url=https%3A%2F%2Fai-native-engineering.netlify.app&up_message=online&down_message=offline&up_color=00C7B7&down_color=ef4444&style=flat-square&label=Netlify&logo=netlify&logoColor=white)](https://ai-native-engineering.netlify.app)
+<a href="https://www.netlify.com">
+  <img src="https://www.netlify.com/assets/badges/netlify-badge-color-accent.svg" alt="Deploys by Netlify" />
+</a>
 
 这不是一本“AI 工具大全”，也不是把一堆新名词摊开讲一遍的科普手册。
 
