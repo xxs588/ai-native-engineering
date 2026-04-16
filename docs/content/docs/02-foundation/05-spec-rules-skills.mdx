@@ -1,254 +1,544 @@
 ---
 title: 规范先行：Spec、Rules、Skills、SOP、模板和代码生成怎么落地
-description: 把一次次碰巧跑通的方法，尽早沉淀成项目控制面资产
+description: 把讨论、Issue、OpenSpec Design/Tasks、Rules 和 Skills 串成一条可复用的 spec-first 控制面流程
 icon: ListChecks
 ---
 
-# 为什么项目刚起步时，我反而更关心控制面资产有没有先长出来
+import { Accordions, Accordion } from 'fumadocs-ui/components/accordion';
 
-如果按很多人对“快速起盘”的直觉，GraphSpec 现在最应该做的，似乎是尽快把图渲染出来，再往上叠 AI 能力。毕竟一个可见的界面，总比几份文档和几条规则更容易让人产生“项目开始了”的感觉。
+# 这篇真正要收的，不是几个名词，而是控制面升级
 
-但我现在越来越不吃这一套。因为 AI Native 项目里，最危险的从来不是起步慢，而是**带着错误边界起步很快**。
+如果回头看 Part 2 前面四篇，它们其实已经把项目起盘最关键的判断收过一轮了：
 
-一旦边界没钉住，AI 会把模糊的意图放大得非常快。今天多写出来的是几个文件，明天固化下来的就是错误的包边界、错误的命令面、错误的任务切分方式。等团队意识到方向不对时，返工的已经不是某个模块，而是整条协作链路。
+1. 需求收敛收的是版本判断
+2. 技术栈定盘收的是最小底板
+3. 仓库起盘收的是协作界面
+4. 系统设计收的是一页边界初稿
 
-所以我现在看项目起盘，第一关注点根本不是“功能有没有先冒出来”，而是：
+按理说，讲到这里，项目应该已经能继续往下做了。
 
-- 有没有一份能钉主线的 Spec
-- 有没有一组长期稳定的 Rules
-- 有没有开始区分未来哪些能力该进 Skills，哪些该进 SOP
-- 有没有模板和校验基线，避免每一轮都从聊天记录重新发明流程
+但真实情况通常不是这样。  
+更常见的情况是：
 
-这些东西在传统项目里很容易被误判成“后面再补的文档层”。但在 AI 协作环境里，它们其实是一套真正的控制面资产。没有这套东西，后面的代码越多，项目只会越玄。
+- 大家知道需求不能直接丢给 AI 开写
+- 也知道技术栈不能一次拍死
+- 也知道仓库和系统边界要先立住
+- 甚至已经写出第一版 proposal 和系统设计初稿
 
-# 先分清一件事：OpenSpec 和 GraphSpec 根本不是一层东西
+可一转身，团队又回到了老路上：
 
-如果这一层不先分开，后面再谈 Spec、Rules、Skills，几乎一定会串味。
+- 还是在聊天里临时提醒 AI 这次该注意什么
+- 还是在评论区反复补“别顺手改这里”
+- 还是靠人脑记住哪些边界要检查
+- 还是每次重写一遍 issue、spec、design 的组织方式
 
-GraphSpec 现在最容易被误解的一点，就是名字里也带一个 `Spec`。很多人下意识会把它理解成“一个更图形化的 OpenSpec”，或者“给 OpenSpec 套了个图形壳”。这条理解路径非常危险，因为它会直接把产品定位带歪。
+所以 05 真正要收的，不是再认识一遍 `Spec`、`Rules`、`Skills`。  
+它真正要回答的是：
 
-我现在更愿意用一种很硬的方式去区分它们：
+**为什么前四篇收下来的判断，不能继续活在人脑、聊天记录和临场 prompt 里，而必须升级成项目控制面资产。**
 
-- **OpenSpec** 负责文本化 change/spec 流程
-- **GraphSpec** 负责结构化架构上下文控制面
-
-OpenSpec 更适合承载 proposal、design、tasks、验收口径、变更历史这类线性资产；GraphSpec 更适合承载结构关系、影响半径、graph 草稿、结构差异、空间化浏览这类网状资产。
-
-这两者不是替代关系，而是互补关系。
-
-如果把项目推进链路写完整一点，我现在更愿意把它写成：
-
-`Issue -> Spec -> Graph -> Code -> Validation`
-
-这里最关键的一点是，`Graph` 不是“文档配图”，而是一层独立资产。它存在的意义，是为了回答文本 spec 很难稳定回答的问题：
-
-- proposal 里定义的边界，和仓库里的真实结构是不是已经漂了
-- 这个底层模块一改，会波及到哪些包、哪些文件、哪些依赖边
-- AI 现在拿到的到底是一整个仓库，还是一个 blast radius 的局部切片
-
-如果没有这层结构化资产，OpenSpec 再清楚，AI 也仍然会在“空间认知”这件事上天然吃亏。
-
-:::note[实战切片：为什么 GraphSpec 不能被写成“OpenSpec 的图形界面”]
-如果把 GraphSpec 定义成“给 OpenSpec 做一层图形界面”，后面很容易出现两个后果：
-
-- 产品会不断往“把文本 spec 画出来”这条路上滑
-- 团队会默认 GraphSpec 的职责是展示，而不是控制结构上下文
-
-而现在更稳的写法是：
-
-- OpenSpec 继续负责 change/spec 流程
-- GraphSpec 负责把结构上下文变成一等资产
-- 两者后面通过 bridge 互相校验、互相增信，而不是互相吞掉
-
-这个差异看起来像概念区分，实际上决定了后面到底是做一个辅助视图，还是做一个真正的架构控制面。
+:::important[这一篇的主线只有一句话]
+AI Native 的升级，不是“文档变多了”，而是项目判断、长期边界和高复用经验，都开始被外置成可以稳定复用的控制面资产。
 :::
 
-# Spec 先行，不是让你先写一份更大的总施工图
+# 为什么前四篇讲完之后，光靠人记和临场 prompt 已经不够了
 
-很多团队一说“规范先行”，脑子里其实想的是另一件事：先写一份巨长的 proposal，把未来几个月的功能、阶段、路径全部摊开，然后直接把这份总纲交给 AI 执行。
+这件事在传统开发里还没那么痛，是因为很多经验本来就默认装在工程师的隐性知识里。
 
-这种做法在人类单线程时代都经常失真，到了 AI 协作时代只会更危险。因为 AI 很擅长把一份模糊但气势很大的文档，执行成一坨边界已经漂掉的实现，而且它越高效，回滚代价越高。
+比如：
 
-GraphSpec 这轮起盘真正让我想明白的，是另一个更稳的判断：
+- 看到某类需求，知道先补 issue
+- 做状态流转设计，知道顺手检查审计和通知
+- 碰到复杂模块，知道先想边界和职责
+- 写 proposal 时，知道哪些该写、哪些不该提前写
 
-**项目早期最需要的 Spec，不是“全量实施说明书”，而是“program seed”。**
+以前这些东西靠“人比较熟”还能撑住。  
+但 AI 一旦进场，问题就会立刻暴露：
 
-也就是说，第一份 Spec 的主要职责不是替未来所有细节拍板，而是先做四件更重要的事：
+1. AI 没法稳定继承工程师的隐性经验
+2. 临场 prompt 太依赖当下有没有想起来
+3. 聊天记录不是可靠的长期载体
+4. 同一类判断如果每次都重写，成本会越来越高
 
-- 钉住产品定位
-- 钉住阶段路线
-- 钉住当前阶段的非目标和验收口径
-- 钉住后续 issue 应该怎么切
+所以 AI Native 的问题从来不只是“模型够不够强”，而是：
 
-这时候 Spec 的价值，不在于“已经把未来都想透了”，而在于“让后面的细化不再反复重定义项目”。
+**那些原本靠资深工程师脑内调用的经验，到底有没有被外置出来。**
 
-所以我现在看 GraphSpec 那份总纲 change，不会把它理解成总施工图，而会把它理解成路线图锚点。它负责告诉后面的 issue：你们该沿着哪条主线继续长，而且哪些方向虽然重要，但现在不要混进来。
+## Example：同一个退款需求，为什么光靠临场提醒一定会漂
 
-:::important[实战切片：program seed 到底值钱在哪]
-GraphSpec 当前的总纲 change 如果只负责“解释 Phase 1 怎么做”，它的价值其实有限，因为后面大家还是会反复问：
+假设现在来了一个需求：
 
-- writable graph 什么时候进来
-- Skill 调 CLI 要怎么接
-- OpenSpec bridge 是不是也算当前范围
+“退款驳回原因要标准化，并且以后可能会加双人复核。”
 
-但当它被写成 `program seed` 之后，它就能多承担一层职责：
+如果只靠聊天里的临场提醒，团队通常会说：
 
-- 先把 phase map 钉住
-- 先把“当前只正式规格化哪一段”钉住
-- 先把未来阶段留在粗粒度，不让它们污染当前实现
+- 记得补驳回原因字段
+- 记得考虑通知
+- 记得考虑审计
+- 记得设计时想想扩展性
 
-这时候后面的每个 issue，才知道自己应该长在什么位置上。
+这些话当然都对，但问题是它们都太依赖“这次有没有想全”了。  
+AI 这轮想到了三条，下一轮可能只想到一条；人这次补了通知，下次可能忘了审计。
+
+这就是为什么前四篇讲的那些判断，如果不进一步沉淀，最后还是会退化成“反复口头提醒”。
+
+# AI Native 的升华，不是多写文档，而是把判断外置成控制面资产
+
+很多人会把这一步误解成：  
+既然 AI 不稳定，那就多写点文档、多写点规范、多加点说明。
+
+但这还不够，甚至经常会适得其反。
+
+因为“文档更多”不等于“控制面更强”。  
+真正的关键不是数量，而是**这些判断有没有被放到正确的载体里**。
+
+这一步更准确的理解可以收成三件事：
+
+1. 原来活在人脑里的判断，开始被写成结构化资产
+2. 原来活在聊天记录里的提醒，开始被写成长期规则
+3. 原来靠临场发挥调用的经验，开始被收成可复用能力
+
+这时候，项目才算真正进入 AI Native 的下一层。  
+因为从这一步开始，AI 不再只是拿到一个任务就硬做，而是开始在一套外置控制面里工作。
+
+## 一段最该被记住的短对照
+
+| 传统做法 | AI Native 做法 |
+| --- | --- |
+| 背八股、看源码、靠资深工程师脑补经验 | 把经验 skill 化 |
+| 靠口头提醒“这次记得别乱来” | 把长期边界 rule 化 |
+| 靠飞书文档、聊天记录、零散提纲保存变化 | 把 change spec 化 |
+
+这才是这一篇真正的“升华感”所在。  
+不是项目里多了几个新名词，而是原来隐性的东西，终于开始被工程化。
+
+:::note[为什么“多写文档”不等于控制面升级]
+还是拿退款审核系统举例。
+
+第一种做法是飞书里补一页说明，聊天里提醒一句“记得通知和审计”，PR 评论里再补一句“以后还要考虑双人复核”。  
+这种做法文档确实更多了，但没有任何东西真的稳定下来，下一个人接手，还是要重新读、重新猜、重新补。
+
+第二种做法是把这次 change 收成 proposal / design / tasks，把“状态流转改动必须同步检查通知和审计”沉淀成长期规则，再把“生成系统设计初稿”和“检查设计模式与异常链路”做成 skill。  
+这时候多出来的不是文档数量，而是可复用的控制面。
 :::
 
-# Rules 的价值，是把聊天里的临时脾气变成长期约束
+# 真正的主线，是把同一个问题在不同载体里一路收紧
 
-很多人对 Rules 有一种误解，觉得它不过是“把一些注意事项写进 AGENTS.md”。这话不算错，但太低估它的作用了。
+真正成熟的 spec-first 流程，不是“先有 issue，再有 OpenSpec，再有 skill”，好像每一层都是独立模块。  
+更接近真实项目的理解应该是：
 
-我现在越来越觉得，Rules 真正值钱的地方，在于它把原本只存在于聊天语境里的判断，变成了未来所有执行默认要遵守的边界。
+**同一个问题，会在不同载体里被连续压缩很多次。**
 
-比如在 GraphSpec 里，这类规则其实都很关键：
+最原始的时候，它只是讨论里的一个模糊判断。  
+进入协作之后，它先被压成 issue。  
+进入 change 之后，它又被压成 `proposal.md`、`design.md`、`specs/` 和 `tasks.md`。  
+如果文档质量还不够，再由 skill 和 rules 继续把这些资产做深。
 
-- 架构层变更需要人工确认
-- 不要顺手做无关重构
-- 删除超过一定规模的代码要人工确认
-- 每个新增 package 至少要有 README、导出说明、最小示例和验证方式
+所以 05 更该讲清楚的，不是“OpenSpec、Rules、Skills 分别是什么”，而是：
 
-这些要求如果只出现在一次对话里，下一个 Agent、下一个 issue、下一轮执行，很可能就全部丢了。可一旦它们被写进长期规则，项目的协作重心就会发生变化：AI 不再只是“每次重新揣摩作者这次大概想要什么”，而是在一个更稳定的护栏里工作。
+**一个问题到底怎样从讨论一路收成可实现的 change。**
 
-所以 Rules 不是文档装饰，而是协作基线。
+先把最容易混淆的几层放到一起看，会清楚很多：
 
-它的作用非常直接：减少反复解释，降低每轮对话的上下文成本，并把一些必须反复提醒的判断，变成默认成立的工程条件。
+| 载体 | 它主要回答什么 | 典型内容 |
+| --- | --- | --- |
+| discussion | 大家到底在担心什么、想推进什么 | 方向、争议、模糊判断 |
+| issue | 这次先收哪一个可协作的问题 | why now、范围、非目标、未决点、验收 |
+| `proposal.md` | 为什么要开这个 change | change 背景、边界、已定 / 待定 |
+| `design.md` | 这次 change 准备怎么做 | 主资产、路径、边界、模式、失败链路 |
+| `specs/<capability>/spec.md` | 相关能力在行为上必须成立什么 | requirement + scenario |
+| `tasks.md` | 怎样按依赖关系把 change 落下去 | 串行阻塞项、可并行项、审核点、验证动作 |
 
-:::tip[实战切片：GraphSpec 里哪些东西应该沉淀成 Rules]
-我现在会把下面这些内容优先视为 Rules，而不是临时说明：
+这里最值得单独指出的一点是：  
+issue 和 proposal 经常在说同一件事，但它们不是重复文档。
 
-- 哪类变更需要人工确认
-- 新增 package 的 README 最低完整度要求
-- 开发前先读最近层级 `AGENTS.md / README.md`
-- 不允许顺手做无关重构
-- 完成后必须说明改了哪些文件、怎么验证
+- issue 面向的是协作系统，解决“这个问题为什么值得现在排进来”
+- proposal 面向的是当前 change，解决“这个问题为什么值得为它开一组正式 spec 资产”
 
-这些规则一旦稳定下来，后面的每轮协作就不用再从“先对齐工作方式”开始。
+所以可以把 issue 理解成 proposal 的前一道收敛，但不要把它们写成互不相干的两条线。
+
+参考：
+
+- [OpenSpec 官方站](https://openspec.dev/)
+- [OpenSpec GitHub 仓库](https://github.com/Fission-AI/OpenSpec)
+
+:::tip[同一个问题，为什么会先长成 issue，再长成 proposal]
+还是拿退款审核系统举例。
+
+讨论里最早冒出来的可能只是一句：“退款驳回原因现在太散，后面可能还要加双人复核。”
+
+这句话还不能直接实现。它先会被压成 issue，变成一个可协作的问题：
+
+- 这次先只做驳回原因标准化
+- 双人复核暂时不进入本轮
+- 当前风险是审核状态流转和通知审计容易漏
+- 验收口径是页面、数据契约和通知链路都要一致
+
+等它再进入 OpenSpec change，proposal 才会接着把它变成正式立论：
+
+- 为什么现在要开这个 change
+- 当前 change 明确不做什么
+- 哪些架构问题已经定了
+- 哪些问题还不能在实现里偷偷拍板
+
+这样看时，issue 和 proposal 不是两份互相陌生的文档，而是同一个问题在两个系统里的连续收敛。
 :::
 
-# Skills 和 SOP，看起来像一类东西，其实职责完全不同
+# 从讨论到 issue：先把问题收成可协作对象
 
-这是很多 AI Native 团队后面必然会踩的坑。
+如果没有这一步，后面的 `proposal.md`、`design.md`、`tasks.md` 很容易从一开始就建在松土上。  
+因为 OpenSpec 再强，也不负责替项目决定“这次到底先收哪一刀”。
 
-大家一开始都会说“把流程沉淀下来”，但沉淀着沉淀着，Skills、SOP、模板就会全部混成一锅。结果是：真正应该被工具化的能力没有被工具化，真正应该由人做判断的流程却被假装自动化了。
+GraphSpec 现有的 [`gh-issue-driven`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/gh-issue-driven/SKILL.md) 正是在接这个断层。  
+它不是普通“帮忙建一个 GitHub issue”的 skill，而是把 discussion、OpenSpec seed 或零散请求，重新压成开发 issue：
 
-我现在更愿意这样分：
+- 先补背景和 why now
+- 再补范围、非目标、未决点和子任务树
+- 再按当前 phase 补最有价值的验收和验证要求
 
-- **Skills** 是稳定执行面
-- **SOP** 是稳定流程面
+这一步真正接管的是：  
+**把模糊讨论变成一个后面能继续被 spec-first 流程接住的问题。**
 
-Skills 解决的是：某种高复用、低歧义、输入输出相对稳定的能力，能不能被封成一个明确接口，让 AI 以后不用每次重新组织动作。
+GraphSpec 的 `AGENTS.md` 其实已经把这条要求写进仓库规则了：  
+如果由 AI 代创建开发 issue，优先使用 `gh-issue-driven`，而且 issue 不能退化成施工单，必须写出 why now、前置依赖、未决点和子任务树。
 
-SOP 解决的是：一条多步流程要不要有固定节奏，谁先判断，谁后执行，在哪一步该停下来做人类确认。
+这就已经不是“仓库里恰好有一个 skill”这么简单了。  
+它说明项目开始把“讨论如何落成 issue”这件事，从人脑经验迁移成了控制面。
 
-放到 GraphSpec 上，这个区别其实非常清楚。
+:::note[为什么 discussion 不该直接跳到 change]
+GraphSpec 的 `v0-local-cli-view` 这一轮，如果直接从讨论跳到实现，很容易变成下面这种失控：
 
-未来“AI 通过命令面查询 graph、提交 graph 修改请求、读取执行结果”，这是 Skills 该接住的事。因为它要的是稳定输入、稳定输出、稳定副作用。
+- 有人觉得先把 scanner 做出来
+- 有人觉得先画一版图
+- 有人又想顺手把 CLI、Web、MCP 一起铺开
 
-而“收到一个需求后，先归属 phase，再决定要不要新开 issue，要不要给这个 issue 补 proposal / design / tasks”，这更像 SOP。它不是一个单步动作，而是一条需要持续做判断的流程。
+这些方向都像是在推进项目，但其实都还没回答同一个问题：当前到底先收哪一层不确定性。
 
-一旦两者混掉，团队就会特别容易做出两种极端：
+而当它先被压成开发 issue 之后，问题就会变成更可操作的句子：
 
-- 把本来应该是流程判断的问题，硬塞给某个 Skill
-- 把本来可以工具化的稳定动作，永远留在口头协作里
+- 当前先收主图资产，而不是扫描器
+- 当前先收 CLI 主入口，而不是完整 graph edit 协议
+- 当前先收节点相关内容和证据层边界，而不是业务流全家桶
 
-这两种情况都会让项目越来越难治理。
-
-:::important[实战切片：GraphSpec 后面哪些更像 Skills，哪些更像 SOP]
-更像 Skills 的：
-
-- 查询某个 cluster 的 children
-- 查询某个 node 的直接入边和出边
-- 提交一份 graph draft 变更请求
-- 读取某次 graph 操作的结果和错误
-
-更像 SOP 的：
-
-- 收到新需求后先判断属于哪个 phase
-- 判断当前问题是不是需要独立 proposal / design / tasks
-- 判断这次 graph 变更是否必须走人工确认
-- 判断某条 bridge 能力现在是方向描述，还是已经到可立项阶段
-
-一个看的是稳定执行接口，一个看的是稳定决策顺序。
+到这一步，OpenSpec change 才有可靠入口。
 :::
 
-# 模板和代码生成真正该在什么时候上场
+# 从 issue 到 OpenSpec change：proposal、design、specs、tasks 是同一个 change 的四个面
 
-项目刚起步时，大家通常都很想尽快拥有模板和代码生成。因为它们太像“效率已经开始飞轮化”的标志了。
+很多文章一提 `OpenSpec`，就会下意识只写三份文档：`proposal.md`、`design.md`、`tasks.md`。  
+但只要真正去看实际 change，很快就会发现这还不够。
 
-但我现在的判断反而更克制：模板可以早，代码生成要晚。
+GraphSpec 的 [`v0-local-cli-view`](https://github.com/OuraAI/GraphSpec/tree/543e99acd5a5dc12caaabc8d15416a14f9e7328a/openspec/changes/v0-local-cli-view) 这一轮，除了 proposal / design / tasks 之外，还有一组 `specs/`：
 
-模板之所以可以早，是因为它主要在降低空白页成本。issue 模板、proposal seed、评审清单、验收清单，这些东西越早出现，后面的沟通成本越低。
+- [`specs/cli-init-view/spec.md`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/openspec/changes/v0-local-cli-view/specs/cli-init-view/spec.md)
+- [`specs/graph-schema/spec.md`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/openspec/changes/v0-local-cli-view/specs/graph-schema/spec.md)
 
-代码生成则完全不同。代码生成不是帮你思考问题，它只能放大已经被确认的结构。换句话说，只有当边界足够稳、契约足够清楚时，codegen 才会开始真正创造价值；否则它只会把猜测快速固化成仓库事实。
+这两份文件特别关键，因为它们把 change 继续往行为要求层压了一次：
 
-GraphSpec 当前阶段就特别适合拿来说明这个区别。
+- `proposal.md` 负责说明这次 change 为什么存在
+- `design.md` 负责说明 change 准备怎么做
+- `specs/<capability>/spec.md` 负责说明相关能力在行为上必须成立什么
+- `tasks.md` 负责说明这些要求怎样被分解成可执行任务
 
-现在最该先定下来的，是：
+如果没有 `specs/` 这一层，proposal 很容易过于宏观，design 很容易过于解释性，tasks 又很容易直接退化成施工顺序单。  
+而有了 `specs/` 之后，change 里就会多出一层非常重要的约束：
 
-- graph snapshot 的最小契约
-- CLI 命令面的最小边界
-- `packages/cli`、`packages/core`、`packages/web` 的基本职责
-- 后续 issue 和小规格应该怎么长
+**能力级要求必须被写成 requirement 和 scenario，而不是只停留在设计判断。**
 
-这些东西在没定稳之前，越早做自动生成，后面返工越大。因为你不是在复制成熟结构，而是在复制还没收敛的误判。
+`openspec-propose` 这类 skill 真正值钱的地方，也就不再只是“帮忙生成三份文档”。  
+它的真正价值是把 change 所需的 artifacts 长出来，直到进入 apply-ready 的状态。  
+在实际 schema 下，这通常就不止 proposal / design / tasks，而是还会包含与 capability 对应的 `specs/`。
 
-:::warning[实战切片：GraphSpec 当前最不该急着自动生成什么]
-我现在最不想在这个阶段看到的，不是“代码写得慢”，而是这些东西被过早批量生成：
+:::important[GraphSpec 的 `specs/` 到底在补哪一层]
+`v0-local-cli-view` 这一轮里，`proposal.md` 已经把大方向说清楚了：
 
-- 一整套未来 Phase 2/3/4 的命令协议
-- 还没定稳的 graph edit 数据模型
-- 假装已经成熟的 MCP / Skill 接口层
-- 一堆为未来多端准备、但当前根本没进入范围的壳子代码
+- GraphSpec 的主资产是架构图
+- scanner 只能是证据层
+- Phase 1 先做整体图、模块下钻和节点相关内容
 
-这些生成看起来很忙，实际上都在提前锁死还没收敛的判断。
+但如果只停在这里，后面的实现仍然可能继续猜。
+
+于是这轮 change 里又有两份 capability spec：
+
+第一份是 `cli-init-view/spec.md`。它把 CLI 和视图这一层压成 requirement：
+
+- CLI 必须作为主图资产的主入口
+- `view` 必须支持整体图和模块下钻
+- 节点详情必须返回相关内容
+- scanner 只能作为辅助证据层
+
+第二份是 `graph-schema/spec.md`。它把图资产这一层压成 requirement：
+
+- 必须存在独立的主图资产
+- 主图资产必须支持嵌套结构
+- 主图资产必须支持多类关系
+- 主图资产必须支持挂接证据
+- 主图资产必须可被后续 CLI / Skill 读写
+
+这样看时，`specs/` 不是装饰层，而是在替 proposal 和 design 把行为要求钉死。
 :::
 
-# 真正的控制面，不是把所有东西都文档化，而是知道什么该沉淀成哪一层资产
+# Design 和 Tasks 的强化，不是平行流程，而是在继续改同一个 change
 
-到这里，Spec、Rules、Skills、SOP、模板和代码生成，其实已经不是一串并列名词了。它们各自对应的是不同层次的问题。
+这里最需要单独说清的，是不要把“系统设计初稿”“设计模式检查”“任务并行规划”“验证入口设计”写成 OpenSpec 外面的第二套工作流。
 
-- Spec 负责定义当前 slice 的目标、边界、非目标和验收口径
-- Rules 负责沉淀长期稳定的协作约束
-- Skills 负责封装高复用、低噪声、可审计的执行能力
-- SOP 负责把判断顺序和协作节奏固定下来
-- 模板负责降低空白页成本
-- 代码生成负责在结构稳定后放大产能
+更准确的写法应该是：
 
-真正成熟的控制面，不是“每样都写一点”，而是**知道当前项目最缺的是哪一层，然后先补那一层。**
+- 系统设计初稿，是在继续加固 `design.md`
+- 设计模式、耦合度、可观测性、失败链路检查，是在继续加固 `design.md`
+- 依赖关系、并行切片、review gate、验证动作，是在继续加固 `tasks.md`
 
-GraphSpec 现在之所以先长 Spec、Rules、README、基线测试和占位骨架，而不是先长一大堆炫目的功能，就是因为这条主线当前最缺的不是输出速度，而是判断不漂。
+也就是说，这些 skill 不是在 change 外面再包一层，而是在继续把同一个 change 做实。
 
-这也是为什么我越来越不愿意把“规范先行”理解成一种道德姿态。它根本不是为了显得更专业，而是为了让后面的每一次执行都不至于重新掉回混乱里。
+这一点在实际试做出来的 Design 强化 skill 上特别明显。  
+一个真正合格的 design review skill，不会只写一句“请考虑设计模式和扩展性”，而是会强制同时读取：
 
-# 看一个沉淀动作值不值钱，就看它能不能让下一个 issue 长得更稳
+- `proposal.md`
+- `design.md`
+- `tasks.md`
+- `specs/**/*.md`
 
-我现在会用一个非常直接的标准判断沉淀有没有做对：
+然后再去检查：
 
-**它有没有让下一个 issue 更容易、更准确地长出来。**
+- 主资产 / 证据层 / 投影层边界
+- 官方路径 / 兜底路径 / 禁止旁路
+- 已定 / 待定 / 不进本 phase
+- 同步 / 异步 / 编排决策
+- 异常链路、回滚 / 补偿 / 审计
+- 观测性
+- 设计模式 / 反模式
+- scanner 有没有越位
+- proposal、design、specs、tasks 之间有没有互相打架
 
-如果某份规则、某个 Spec、某个模板写完之后，后面的协作还是要从头解释项目是什么、当前 phase 是什么、哪些东西不该做，那这个沉淀大概率还没真正发挥价值。
+这时候，所谓“八股”“设计经验”“架构判断”才真正落了地。  
+它们不是漂浮在聊天里的提醒，而是被组织成一套继续改进 `design.md` 的工作流。
 
-反过来，如果一轮沉淀之后，后面的 issue 已经自然能沿着同一条主线长出来，大家不再反复重定义边界，那这些资产就开始真正变值钱了。
+Tasks 也是一样。  
+一个值钱的 Tasks 强化 skill，目标不是把任务写得更多，而是把 `tasks.md` 从“施工顺序单”改成“交付图”：
 
-对 GraphSpec 来说，这个变化其实已经很明显了。当前最重要的成果，不是某个功能被写完，而是：
+- 哪些任务是串行阻塞项
+- 哪些任务可以并行
+- 哪些节点必须回看 design
+- 哪些节点必须先过 build、test、benchmark、review
+- 如果项目偏好多 Agent 并行，写入边界怎么切、合流点怎么设
 
-- 项目定位已经不再漂成“单纯依赖图工具”
-- 当前 phase 已经被收成 CLI-first 的只读 graph
-- 后续路线已经被保留成粗粒度 phase map
-- tasks 已经开始朝 issue seeds 的方向写，而不是巨型施工单
+:::note[为什么 Design 强化 skill 必须同时读 proposal、design、tasks、specs]
+还是用退款审核系统举例。
 
-这意味着后面的推进终于可以从“每一轮都重新定义问题”，进入“沿着同一条路线逐步细化问题”。
+假设 `openspec-propose` 已经生成了第一版 change：
 
-这就是控制面资产真正开始工作的时候。
+- proposal 写了“这次做驳回原因模板化，不做双人复核”
+- design 写了“审核服务负责通知与审计”
+- spec 写了“驳回原因必须标准化”
+- tasks 写了“改数据库、改后端、改前端、测试”
 
-:::important[顺着往下读]
+如果这时只看 `design.md`，很容易觉得已经差不多了。
+
+但一个真正会加固设计的 skill，不会只看这一份文件。它会顺手发现一整串更深的问题：
+
+- proposal 说双人复核不进本轮，design 却已经开始给双人复核拍状态机
+- spec 说的是行为要求，design 却还没说模板到底属于事实层还是配置投影
+- design 已经引入通知和审计副作用，tasks 却没有任何 review gate 和失败链路处理节点
+
+这时 skill 真正接管的，不是“多想一点”，而是**跨 artifact 的一致性检查**。
+:::
+
+# 现成 skill 已经能接住前半程，后半程则继续往 Design 和 Tasks 上长
+
+顺着这条线再看 GraphSpec 现有 skill，意义会比“罗列技能清单”清楚得多。
+
+| 阶段 | 现成 skill | 它真正接管了什么 |
+| --- | --- | --- |
+| discussion -> issue | [`gh-issue-driven`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/gh-issue-driven/SKILL.md) | 把 discussion、seed、零散请求压成可协作的开发 issue |
+| issue -> spec-first delivery | [`gh-issue-delivery`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/gh-issue-delivery/SKILL.md) | 先提问、先落持久化 spec、再按依赖图拆 tasks，不允许拿到 issue 直接写代码 |
+| explore / change 起手 | [`openspec-explore`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/openspec-explore/SKILL.md) | 在 proposal 之前先做 change 探索和上下文澄清 |
+| create change artifacts | [`openspec-propose`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/openspec-propose/SKILL.md) | 把 change 所需 artifacts 长出来，直到进入 apply-ready |
+| implement change | [`openspec-apply-change`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/openspec-apply-change/SKILL.md) | 按 change 文档推进实现，并回写 task 状态 |
+| archive change | [`openspec-archive-change`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/openspec-archive-change/SKILL.md) | 收口已完成的 change，必要时同步 delta specs |
+| implementation tooling | [`script-strategy`](https://github.com/OuraAI/GraphSpec/blob/543e99acd5a5dc12caaabc8d15416a14f9e7328a/.agents/skills/script-strategy/SKILL.md) | 避免脚本、自动化和仓库工具实现方式随手乱长 |
+
+如果把这张表按流程读一遍，就会发现：
+
+- 前半程的“讨论 -> issue -> change 创建”，GraphSpec 已经有相当强的 skill 覆盖
+- 后半程真正最需要继续长的，不是再来一个“再生成一遍 change”的工具
+- 而是继续把 `design.md` 和 `tasks.md` 做深的 skill
+
+这也是为什么后续最有价值的 skill，往往会集中在两类：
+
+| Skill 方向 | 主要加固哪个资产 | 它真正接管的重复劳动 |
+| --- | --- | --- |
+| `system-design-draft` | `design.md` | 把主资产、官方路径、关键边界、已定 / 待定问题压到稳定粒度 |
+| `openspec-design-review-pattern-check` 类 | `design.md` | 把设计模式、异常链路、回滚补偿、phase 边界、跨 artifact 一致性拉进正式检查 |
+| `tasks-delivery-planner` | `tasks.md` | 把依赖图、review gate、验证动作、交付顺序写进去 |
+| `parallel-delivery-planner` | `tasks.md` | 把多 Agent 并行切片、写入边界和合流点写清楚 |
+
+<Accordions type="multiple">
+<Accordion title="Prompt：如果仓库里还没有 issue -> OpenSpec bridge skill" id="create-issue-to-change-skill-prompt">
+```md
+请使用 create skill 新建一个 `issue-to-openspec-change` 类 skill。
+
+这个 skill 的目标不是直接实现功能，而是读取一个开发 issue、项目规则和仓库现有 OpenSpec 结构，
+把 issue 转成一个可审核的 OpenSpec change。
+
+它至少要完成这些事情：
+- 先提炼 issue 里的 why now、范围、非目标、未决点
+- 判断这个 issue 是否已经足够收敛，能不能进入 change
+- 不够收敛时先补 2-3 个关键问题
+- 创建或更新对应 change
+- 生成 proposal.md、design.md、tasks.md，以及 schema 需要的 specs/*
+- 明确哪些内容是 issue 继承过来的，哪些是当前 change 新增收束
+
+输出要求：
+- 明确 skill 的触发条件
+- 明确输入是 issue，不是聊天里的模糊需求
+- 明确 proposal / design / specs / tasks 分别怎么产出
+- 明确哪些情况下必须停下来等待人工审核
+```
+</Accordion>
+
+<Accordion title="Prompt：如果仓库里还没有 Design 强化 skill" id="create-design-skill-prompt">
+```md
+请使用 create skill 新建一个 `openspec-design-review-pattern-check` 类 skill。
+
+这个 skill 的目标不是重新发明一套设计流程，而是读取当前 change 的
+proposal.md、design.md、tasks.md、specs/**/*.md 和项目规则，
+继续加固 design.md 的质量。
+
+它至少要检查这些问题：
+- 主资产、证据层、投影层有没有混淆
+- 官方路径、兜底路径、禁止旁路有没有写清楚
+- 已定 / 待定 / 不进本 phase 有没有分开
+- 同步 / 异步 / 编排决策有没有说清
+- 异常链路、回滚、补偿、审计、观测性有没有遗漏
+- scanner、缓存、视图、派生物有没有越位
+- proposal / design / specs / tasks 之间有没有互相打架
+
+输出要求：
+- findings 优先，不要先写空泛总结
+- 明确 readiness 判断
+- 如果用户要求优化，直接补 design.md
+- 不要把未来 phase 的能力偷偷写进当前 design
+```
+</Accordion>
+
+<Accordion title="Prompt：如果仓库里还没有 Tasks 强化 skill" id="create-tasks-skill-prompt">
+```md
+请使用 create skill 新建一个 `tasks-delivery-planner` 类 skill。
+
+这个 skill 的目标是读取当前 issue、proposal、design、specs、tasks 和项目规则，
+把 tasks.md 从施工顺序单改成真正可执行的交付图。
+
+它至少要考虑这些事情：
+- 任务之间的依赖关系和阻塞关系
+- 哪些任务可以并行，哪些必须串行
+- 每个任务的写入边界和合流节点
+- 哪些节点必须回看 design
+- build、test、benchmark、review、PR 等验证动作该放在哪个节点
+- 如果项目偏好多 Agent 并行开发，切片该怎么拆得更稳定
+
+输出要求：
+- 强制区分串行阻塞项、可并行项、审核点
+- 不允许只写“改后端、改前端、补测试”
+- 最终产物应能直接用于改进现有 tasks.md
+```
+</Accordion>
+</Accordions>
+
+# 要减少人工调度，就把触发条件写进 skill description，把顺序写进 AGENTS
+
+全文如果只讲到这里，还是会留下一个现实问题：
+
+这些 skill、rules 和 spec 资产虽然已经能串起来了，但如果每次都靠人工记住“现在该调用哪个 skill”，效率仍然会很低。
+
+真正更高效的做法，通常有两层。
+
+## 第一层：skill description 不是简介，它本身就是触发面
+
+如果 skill 的 `description` 只写成“一个用来优化设计的 skill”，那 agent 很难在正确时机主动想到它。  
+但如果 description 直接把触发条件写清楚，效果就会完全不同。
+
+比如一个真正值钱的 Design 强化 skill，description 就应该明确写出类似这种语义：
+
+- 当 change 已经创建完成
+- 当目标是 review / tighten / patch `design.md`
+- 当时机是在实现前，或者 issue 拆分前
+- 当输入要同时读 proposal / design / tasks / specs
+
+这样写时，description 就不再只是仓库说明文案，而是 skill 的渐进式索引入口。  
+agent 在创建完 change、准备进入实现、或者发现 design 质量不稳时，更容易自动加载到正确能力。
+
+Tasks 强化 skill 也是一样。  
+description 里应该直接写明：它适合在 `tasks.md` 已经存在、但仍然太线性、太缺依赖图、太缺并行切片时触发。  
+这样 agent 才知道它不是“写代码之前随便看一眼”，而是特定节点上的下一步动作。
+
+## 第二层：AGENTS 负责把整条顺序写死
+
+只有 skill description 还不够。  
+因为 description 解决的是“现在像不像该触发这个 skill”，而不是“整个仓库默认要求先做什么、后做什么”。
+
+这一层更适合交给 `AGENTS.md`。
+
+GraphSpec 当前的 `AGENTS.md` 其实已经在做这件事了：
+
+- 如果由 AI 代创建开发 issue，优先使用 `gh-issue-driven`
+- 如果由 AI 接手开发 issue，优先使用 `gh-issue-delivery`
+- 解决 issue 前必须先提问、先产出可审核 spec、再等待人工审核
+- `tasks` 必须按依赖关系和并行性组织，不能只写直线施工顺序
+
+这就已经不是“技能列表”，而是仓库级流程编排了。
+
+如果项目想进一步自动化，还可以继续把顺序写得更明确：
+
+1. 讨论收住之后，先进入 `gh-issue-driven`
+2. issue 确认后，进入 `gh-issue-delivery` 或等价的 issue-to-change bridge
+3. change 生成后，自动触发 Design 强化 skill
+4. design 收口后，自动触发 Tasks 强化 skill
+5. 然后才进入 `openspec-apply-change`
+6. 全部完成后再进入 `openspec-archive-change`
+
+到这一步，项目就不再只是“有一堆 skill 可用”，而是开始有一条能够自己往前滚的控制面主线。
+
+:::tip[为什么 skill description 和 AGENTS 要一起用]
+还是用退款审核系统举例。
+
+如果只有一堆 skill 文件摆在仓库里，团队通常还是要靠人工记住：
+
+- 先写 issue，还是先开 change
+- design 写完后要不要再 review
+- tasks 拆完后要不要再做并行规划
+
+这类工作很快又会退回口头调度。
+
+但如果 skill description 已经写清触发条件，AGENTS 又把顺序写成默认规则，流程就会顺很多：
+
+- 讨论收住后，AI 更容易先触发 issue skill
+- issue 进入实现前，AI 更容易先触发 issue delivery 或 issue-to-change bridge
+- change 创建后，AI 更容易继续触发 design review skill
+- design 收口后，AI 更容易继续触发 tasks planner
+
+这时候项目真正外置出来的，就不只是某个 skill，而是整条默认工作流。
+:::
+
+# 到这里，Part 2 才真正收束
+
+Part 2 前四篇收下来的，是项目起盘阶段最关键的判断：  
+需求怎么收，技术栈怎么定，仓库先立哪些协作界面，系统设计先交出什么样的一页初稿。
+
+05 再往前走了一步。  
+它真正收住的，不是“又认识了 `OpenSpec`、`Rules`、`Skills` 这几个名词”，而是看清了一条更完整的主线：
+
+- discussion 先被收成可协作的 issue
+- issue 再被收成 change 的 proposal
+- proposal、design、specs、tasks 一起构成同一个 change 的不同收束面
+- 系统设计初稿、设计模式检查、任务依赖图、并行切片，不是平行流程，而是在继续加固这个 change
+- skill description 负责让正确能力在正确时机被触发
+- `AGENTS.md` 负责把整条默认顺序写成仓库规则
+
+所以这一章最后真正留下来的判断是：
+
+**AI Native 项目的升级，不是多了几个工具入口，而是项目终于学会把同一个问题从 discussion、issue、proposal、design、specs、tasks 一路收紧，并把这条顺序外置成可复用的控制面流程。**
+
+到这里，Part 2 才算真正完成。  
+前四篇把项目的起盘判断立住，这一篇则把这些判断推进成一套可以长期稳定生效的开发控制面。
+
 下一篇：[《任务拆解与执行节奏》](/docs/03-development/01-task-breakdown)
-
-当 Spec、Rules、SOP 和执行面都开始长出来之后，真正的问题就变成了：第一批 issue 到底怎么切，怎么避免 AI 一上来又把事情做大。
-:::
