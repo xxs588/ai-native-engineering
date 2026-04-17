@@ -22,6 +22,12 @@ if [ $RESULT -ne 0 ]; then
   exit 1
 fi
 
+bun run types:check
+if [ $? -ne 0 ]; then
+  echo "Type check failed. Please fix the errors before committing."
+  exit 1
+fi
+
 for file in $STAGED_FILES; do
   git add "$file"
 done
