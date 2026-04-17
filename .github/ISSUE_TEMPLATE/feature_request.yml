@@ -35,7 +35,7 @@ body:
     attributes:
       label: 影响范围
       description: 哪些文件或章节会受影响？
-      placeholder: "例：docs/content/docs/part2/03-xxx/ 目录下新增文章"
+      placeholder: "例：docs/content/docs/02-foundation/ 目录下新增文章"
     validations:
       required: false
 

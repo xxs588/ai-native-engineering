@@ -49,7 +49,7 @@ body:
     attributes:
       label: 涉及文件
       description: 列出需要改动的文件或章节路径
-      placeholder: "例：docs/content/docs/part1/01-paradigm-shift/01-xxx.mdx"
+      placeholder: "例：docs/content/docs/01-breakthrough/01-paradigm-shift.mdx"
     validations:
       required: false
 
