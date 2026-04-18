@@ -1,0 +1,29 @@
+---
+title: Agent Team：多 Agent 不是多开窗口，而是有合同、有边界、有合流点的团队
+description: 用 MultiAgent 视角重写任务分工、共享状态、锁和 verifier，而不是迷信人数
+icon: Workflow
+---
+
+# 这篇先反对哪种最常见的“多 Agent 幻觉”
+
+很多人一提 MultiAgent，脑子里就是“多开几个窗口一起冲”。这当然能制造一点热闹，但大多数时候也只是在并行复制混乱。
+
+真正值钱的不是 agent 数量，而是它们之间有没有像一个团队那样工作：
+
+- 谁对什么结果负责。
+- 谁能改哪些状态。
+- 谁只负责验证，不负责生成。
+- 哪些节点必须合流，不能各写各的。
+
+# 这篇会把 Agent Team 的哪些硬约束讲清楚
+
+这一章会把 MultiAgent 真正该讲的内容拉回工程系统：
+
+- planner、worker、reviewer、verifier、merger 这些角色怎么分。
+- 共享上下文、共享状态、锁、合同和合流点怎么设计。
+- 什么任务适合 Agent Team，什么任务强行拆多 agent 只会更慢。
+- 为什么没有 verifier 和 merge discipline，多 agent 只会把错误并行放大。
+
+这一章最后真正留下的不是“多 Agent 很酷”，而是：
+
+**只有当系统已经学会分工、交接、校验和合流时，MultiAgent 才会从噱头变成生产力。**

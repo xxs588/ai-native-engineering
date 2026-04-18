@@ -1,0 +1,28 @@
+---
+title: System of Record 与共享记忆：什么必须写回 repo，什么必须及时忘掉
+description: 把决策、进度和长期知识分层沉淀，避免旧上下文长期统治新任务
+icon: BrainCircuit
+---
+
+# 这篇先治哪种“记得太多反而更糟”的病
+
+项目一旦开始长时间运行，系统很容易进入另一种危险：它看起来什么都记住了，但真正影响判断的，往往是过期路径、旧结论和历史线程里的半成品。
+
+这时候真正需要的，不是“继续多记一点”，而是先分清：
+
+- 什么必须成为 repo 内的 system of record。
+- 什么只适合作为短期任务记忆。
+- 什么必须被及时遗忘，否则会持续污染后续判断。
+
+# 这篇会把哪些状态资产分开
+
+这一章会重点拆这些东西：
+
+- 决策日志、progress log、feature list、design note、task state 各自适合落在哪里。
+- 为什么 repo-local memory 和线程记忆不能混成一团。
+- 为什么 append-only context 很容易把系统拖进 semantic drift。
+- 什么时候该 compact，什么时候该 archive，什么时候该直接清掉。
+
+写完这一章之后，读者应该能开始用 system of record 的视角看项目：
+
+**不是所有信息都值得长期保存，但那些真的该被长期信任的信息，必须有稳定落点。**
